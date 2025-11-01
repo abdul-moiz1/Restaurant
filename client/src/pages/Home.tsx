@@ -74,27 +74,23 @@ export default function Home() {
           </p>
           <div className="flex gap-4 justify-center">
             <Link href="/signup">
-              <a>
-                <Button
-                  size="lg"
-                  className="backdrop-blur-md bg-primary/90 hover:bg-primary"
-                  data-testid="button-hero-signup"
-                >
-                  Get Started
-                </Button>
-              </a>
+              <Button
+                size="lg"
+                className="backdrop-blur-md bg-primary/90 hover:bg-primary"
+                data-testid="button-hero-signup"
+              >
+                Get Started
+              </Button>
             </Link>
             <Link href="#menu">
-              <a>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="backdrop-blur-md bg-white/10 border-white text-white hover:bg-white/20"
-                  data-testid="button-hero-menu"
-                >
-                  Browse Menu
-                </Button>
-              </a>
+              <Button
+                size="lg"
+                variant="outline"
+                className="backdrop-blur-md bg-white/10 border-white text-white hover:bg-white/20"
+                data-testid="button-hero-menu"
+              >
+                Browse Menu
+              </Button>
             </Link>
           </div>
         </div>
@@ -123,9 +119,7 @@ export default function Home() {
                 No menu items available yet. Check back soon!
               </p>
               <Link href="/signup">
-                <a>
-                  <Button>Join as a Restaurant Owner</Button>
-                </a>
+                <Button>Join as a Restaurant Owner</Button>
               </Link>
             </div>
           ) : (
@@ -147,11 +141,9 @@ export default function Home() {
             Join Gourmet Haven today and experience the finest in dining
           </p>
           <Link href="/signup">
-            <a>
-              <Button size="lg" data-testid="button-footer-signup">
-                Sign Up Now
-              </Button>
-            </a>
+            <Button size="lg" data-testid="button-footer-signup">
+              Sign Up Now
+            </Button>
           </Link>
         </div>
       </section>
