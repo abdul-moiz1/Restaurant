@@ -4,6 +4,35 @@
 
 Gourmet Haven is a dual-role restaurant platform built with React and Firebase that serves both restaurant owners and customers. The application allows restaurant owners to manage their menu items (create, update, delete dishes) while customers can browse available dishes and set dietary preferences. The platform features a modern, elegant design inspired by upscale restaurant platforms like OpenTable and Resy, with a focus on culinary refinement.
 
+## Recent Changes (November 2025)
+
+**Enhanced User Experience**
+- Redesigned home page with premium hero banner featuring parallax zoom effect on hover
+- Added "Refined global cuisine, curated for your taste" as the main tagline
+- Implemented smooth scroll-to-menu functionality with animated chevron button
+- Created dedicated Menu page (/menu) with live search and dietary filters
+- Built Preferences page (/preferences) for customers to set dietary restrictions, allergens, and spice tolerance
+- Added Checkout page (/checkout) as protected route for authenticated customers
+
+**Navigation & Routing**
+- Enhanced navbar with Home, Menu, and Preferences links accessible to all users
+- Active link highlighting with gold accent color
+- Role-based dashboard link (Dashboard for owners, Checkout for customers)
+- Improved responsive design for mobile devices
+
+**Design Enhancements**
+- Gold accent color (#c9a348) consistently applied throughout the app
+- Playfair Display serif font for headings, creating elegant typography
+- Smooth hover transitions and subtle shadows on interactive elements
+- Added react-hot-toast for modern toast notifications
+- Implemented footer with copyright information
+- Enhanced spacing and visual hierarchy across all pages
+
+**Authentication Improvements**
+- Added displayName field to user signup flow
+- Updated all authentication forms to support full name collection
+- Improved Google OAuth integration with role selection
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -32,10 +61,15 @@ Preferred communication style: Simple, everyday language.
 - TanStack Query for caching and synchronizing server data
 
 **Routing Strategy**
-- Public routes: Home page (browsable menu without authentication)
+- Public routes (accessible without authentication):
+  - Home page (/) - Hero banner with featured dishes
+  - Menu page (/menu) - Browse all available dishes with search and filters
+  - Preferences page (/preferences) - Set dietary preferences and allergens
+  - Login (/login) - Email/password and Google OAuth authentication
+  - Signup (/signup) - Account creation with role selection
 - Protected routes with role-based access control:
-  - Customer Dashboard (requires "customer" role)
-  - Owner Dashboard (requires "owner" role)
+  - Checkout (/checkout) - Customer-only checkout page (requires "customer" role)
+  - Owner Dashboard (/owner) - Menu management (requires "owner" role)
 - Automatic redirects based on authentication status and user role
 
 ### Backend Architecture
@@ -56,7 +90,9 @@ Preferred communication style: Simple, everyday language.
 - Email/password and Google OAuth sign-in methods
 - Role-based access control with two user types: "owner" and "customer"
 - User roles stored in Firestore and cached in React Context
+- User profiles include: uid, email, displayName, role, createdAt
 - Protected routes enforce role requirements on both client and server
+- Role selection during signup for both email and Google authentication
 
 ### Data Storage Solutions
 
@@ -69,10 +105,10 @@ Preferred communication style: Simple, everyday language.
 **Firebase Firestore**
 - Primary data store for application data
 - Collections:
-  - `users/{uid}`: User profile data including role, email, createdAt
-  - `users/{uid}/preferences/dietary`: Customer dietary preferences
+  - `users/{uid}`: User profile data including role, email, displayName, createdAt
   - `menu`: Restaurant menu items with dish details
-- Menu items include: name, description, price, imageUrl, tags, available status, ownerId
+- Menu items include: name, description, price, imageUrl, tags, available status, ownerId, dietaryType (optional), allergens (optional), spiceLevel (optional)
+- Customer preferences stored in localStorage for filtering menu items
 - Queries filtered by ownerId for owner-specific menu management
 
 **Firebase Storage**
