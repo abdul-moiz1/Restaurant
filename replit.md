@@ -6,32 +6,58 @@ Gourmet Haven is a dual-role restaurant platform built with React and Firebase t
 
 ## Recent Changes (November 2025)
 
-**Enhanced User Experience**
-- Redesigned home page with premium hero banner featuring parallax zoom effect on hover
-- Added "Refined global cuisine, curated for your taste" as the main tagline
-- Implemented smooth scroll-to-menu functionality with animated chevron button
-- Created dedicated Menu page (/menu) with live search and dietary filters
-- Built Preferences page (/preferences) for customers to set dietary restrictions, allergens, and spice tolerance
-- Added Checkout page (/checkout) as protected route for authenticated customers
+**Complete UI Redesign (Latest)**
+- Redesigned home page with animated golden logo (UtensilsCrossed icon with pulse and rotate animations)
+- Enhanced hero section with "Elevate Your Dining Experience" headline and "Refined global cuisine, curated for your taste" tagline
+- Moved preferences section below hero with cuisine filters, dietary restrictions, price range slider
+- Updated color palette to gold (#D4AF37) and ivory (#FAF7F2) for premium aesthetic
+- Created elegant footer with animated plate and fork icons, contact information, and copyright
+- Implemented comprehensive Framer Motion animations across all pages with hover/tap effects
+- Added glass morphism effects on cards with backdrop blur and subtle shadows
+
+**Shopping Cart System**
+- Created CartContext with React Context API for global cart state management
+- Implemented Cart page (/cart) with item management and checkout flow for customers
+- Added "Add to Cart" functionality throughout Menu page and MenuCard components
+- Cart icon in navbar shows item count badge for logged-in customers
+- Cart state persists in localStorage for seamless experience
+- Toast notifications for cart actions (add, remove, clear, checkout)
+
+**Enhanced Menu Page**
+- Real-time search across dish names, descriptions, and tags
+- Filter by dietary type (All, Vegetarian, Vegan, Pescatarian, etc.)
+- Filter by cuisine type with multi-select (Italian, Japanese, Indian, etc.)
+- Price range slider for budget filtering
+- Availability badges showing "Available" or "Unavailable" status
+- "Add to Cart" buttons with shopping cart icons
+- Resilient filtering that handles missing Firestore fields gracefully
+
+**Owner Dashboard Improvements**
+- Updated styling to match new gold/ivory color scheme
+- Maintained Firebase Storage image upload with drag-and-drop support
+- Dish management (add, edit, delete) with real-time updates
+- Dashboard statistics showing total dishes, available count, and average price
+- Modal-based add/edit dish forms with comprehensive fields
 
 **Navigation & Routing**
-- Enhanced navbar with Home, Menu, and Preferences links accessible to all users
-- Active link highlighting with gold accent color
-- Role-based dashboard link (Dashboard for owners, Checkout for customers)
-- Improved responsive design for mobile devices
+- Updated navbar to show Login button only when not authenticated
+- Cart icon appears for logged-in customers with item count badge
+- Removed Preferences link from navbar (preferences now on Home page)
+- Uses wouter for proper SPA navigation (no window.location.href)
+- Smooth transitions between pages preserving auth and cart context
 
-**Design Enhancements**
-- Gold accent color (#c9a348) consistently applied throughout the app
-- Playfair Display serif font for headings, creating elegant typography
-- Smooth hover transitions and subtle shadows on interactive elements
-- Added react-hot-toast for modern toast notifications
-- Implemented footer with copyright information
-- Enhanced spacing and visual hierarchy across all pages
+**Authentication & Role Selection**
+- Role selector modal for Google Sign-In (Customer vs Owner selection)
+- Visual role cards with icons and descriptions
+- Email/password login with role stored in Firestore
+- Automatic redirection based on user role after authentication
 
-**Authentication Improvements**
-- Added displayName field to user signup flow
-- Updated all authentication forms to support full name collection
-- Improved Google OAuth integration with role selection
+**Sample Data**
+- Created sample dishes script (scripts/add-sample-dishes.ts) with 10 realistic menu items
+- Includes diverse cuisines: Italian, Japanese, Indian, Mediterranean, American
+- Covers all dietary types: Vegetarian, Vegan, Pescatarian, All
+- High-quality Unsplash images for each dish
+- Price range from $12 to $65 for testing filters
 
 ## User Preferences
 
@@ -51,26 +77,29 @@ Preferred communication style: Simple, everyday language.
 - shadcn/ui component library built on Radix UI primitives
 - Tailwind CSS for styling with a custom design system
 - Design tokens defined for consistent spacing, typography, and colors
-- Custom theme based on "new-york" style with neutral base colors
-- Gold accent color (#c9a348) as primary brand color
+- Custom theme based on "new-york" style with premium colors
+- Gold (#D4AF37) and ivory (#FAF7F2) color palette for elegant restaurant aesthetic
 - Serif fonts (Playfair Display/Cormorant Garamond) for headings, sans-serif (Inter/Source Sans Pro) for body text
+- Framer Motion for smooth animations and transitions
+- Glass morphism effects with backdrop blur on cards and overlays
 
 **State Management**
-- React Context API for authentication state (AuthContext)
+- React Context API for authentication state (AuthContext) and shopping cart (CartContext)
+- CartContext manages global cart state with localStorage persistence
 - Local component state with useState for form management
 - TanStack Query for caching and synchronizing server data
 
 **Routing Strategy**
 - Public routes (accessible without authentication):
-  - Home page (/) - Hero banner with featured dishes
-  - Menu page (/menu) - Browse all available dishes with search and filters
-  - Preferences page (/preferences) - Set dietary preferences and allergens
+  - Home page (/) - Hero banner with animated logo, tagline, and preferences section
+  - Menu page (/menu) - Browse all available dishes with search, filters, and "Add to Cart"
   - Login (/login) - Email/password and Google OAuth authentication
   - Signup (/signup) - Account creation with role selection
 - Protected routes with role-based access control:
-  - Checkout (/checkout) - Customer-only checkout page (requires "customer" role)
+  - Cart (/cart) - Shopping cart page (requires "customer" role)
   - Owner Dashboard (/owner) - Menu management (requires "owner" role)
 - Automatic redirects based on authentication status and user role
+- Uses wouter for SPA navigation to preserve React Context state
 
 ### Backend Architecture
 
@@ -135,8 +164,10 @@ Preferred communication style: Simple, everyday language.
 
 **Third-Party UI Libraries**
 - Radix UI: Accessible, unstyled component primitives (dialogs, dropdowns, forms, etc.)
-- Lucide React: Icon library for UI elements
+- Lucide React: Icon library for UI elements (UtensilsCrossed, ShoppingCart, User, Store, etc.)
 - React Hook Form with Zod resolvers: Form validation and management
+- Framer Motion: Animation library for smooth transitions and interactive effects
+- React Hot Toast: Modern toast notifications for user feedback
 - date-fns: Date formatting and manipulation
 
 **Development Tools**
