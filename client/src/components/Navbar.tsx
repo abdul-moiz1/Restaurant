@@ -43,7 +43,7 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
           <Link 
             href="/"
             data-testid="link-home"
-            className="text-xl font-serif font-bold flex items-center gap-2 group"
+            className="text-xl font-serif font-bold flex items-center gap-3 group"
           >
             <UtensilsCrossed className="w-6 h-6 text-[#D4AF37] group-hover:scale-110 transition-transform" />
             <span className="bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37] bg-clip-text text-transparent animate-shimmer-text">
