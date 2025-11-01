@@ -1,0 +1,86 @@
+Enhance my existing React + Firebase restaurant app “Gourmet Haven”.
+
+🎯 Goals:
+1️⃣ Improve the **Owner Dashboard** UI.
+2️⃣ Add full CRUD (Create, Read, Update, Delete) functionality for menu items.
+3️⃣ Enhance design aesthetics and usability with TailwindCSS.
+
+────────────────────────────
+📦 Requirements:
+
+- Update `OwnerDashboard.jsx`:
+  - Show a summary section (Total Dishes, Available, Unavailable).
+  - Add an elegant “Add Dish” button that opens a modal (using Tailwind/Headless UI) with the form fields:
+    • Dish Name
+    • Description
+    • Price
+    • Image URL (preview when typed)
+    • Tags (comma-separated, e.g. "Vegan,Spicy")
+    • Availability (checkbox)
+  - Allow editing and deleting existing dishes directly from the list.
+  - Each dish card should display:
+    - Dish Image
+    - Name
+    - Description
+    - Price
+    - Tags (as rounded gold badges)
+    - Availability status
+    - Edit and Delete icons
+
+- Firestore integration (in `/src/firebase.js`):
+  - Menu collection: `menu`
+  - Each dish document:  
+    ```
+    {
+      name: string,
+      description: string,
+      price: number,
+      imageUrl: string,
+      tags: array,
+      available: boolean,
+      ownerId: string,
+      createdAt: serverTimestamp()
+    }
+    ```
+  - Load only dishes created by the logged-in owner.
+
+- Add `DishFormModal.jsx` (new component):
+  - Controlled form for adding/editing dishes.
+  - Reusable for both new and existing items.
+  - Submit button should add or update the dish in Firestore.
+
+────────────────────────────
+🎨 Design Enhancements:
+
+- Color palette:
+  - Background: `#f8f7f3`
+  - Accent gold: `#c9a348`
+  - Cards: white with subtle shadow (`shadow-md`)
+- Typography:
+  - Headings → Playfair Display
+  - Text → Inter or Poppins
+- Components:
+  - Add smooth transitions on hover for cards and buttons.
+  - Show dish image in a rounded container.
+  - “Your Menu” section in a 3-column responsive grid.
+- Add a top header bar with app name and Logout button (already present, keep consistent style).
+
+────────────────────────────
+🧠 Functional Flow:
+
+1. When the owner clicks “Add Dish” → open modal.
+2. Submit → save dish data in Firestore.
+3. Fetch dishes in real time from Firestore using `onSnapshot`.
+4. Allow inline delete confirmation.
+5. Display counts dynamically (Total, Available, Unavailable).
+
+────────────────────────────
+💡 Bonus:
+- Include placeholder dish images if no image URL is provided.
+- Add subtle animation (Framer Motion or Tailwind transitions) when dishes appear.
+
+────────────────────────────
+📣 After setup:
+Print in console → 
+“✨ Owner Dashboard upgraded — menu management and design enhanced successfully!”
+
