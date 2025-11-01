@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useLocation } from "wouter";
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,6 @@ import { Separator } from "@/components/ui/separator";
 import { SiGoogle } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import RoleSelector from "@/components/RoleSelector";
 
 export default function Signup() {
   const [, setLocation] = useLocation();
@@ -18,40 +17,59 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showRoleSelector, setShowRoleSelector] = useState(false);
-  const [pendingCredentials, setPendingCredentials] = useState<{ email: string; password: string; displayName: string } | null>(null);
-  const [isGoogleSignup, setIsGoogleSignup] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<"owner" | "customer" | null>(null);
+
+  useEffect(() => {
+    const role = localStorage.getItem("selectedRole") as "owner" | "customer" | null;
+    if (role) {
+      setSelectedRole(role);
+    } else {
+      setLocation("/");
+      toast({
+        title: "Please select a role",
+        description: "Click Sign Up button to select your role first.",
+        variant: "destructive",
+      });
+    }
+  }, [setLocation, toast]);
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPendingCredentials({ email, password, displayName });
-    setShowRoleSelector(true);
-  };
-
-  const handleGoogleSignup = () => {
-    setIsGoogleSignup(true);
-    setShowRoleSelector(true);
-  };
-
-  const handleRoleSelect = async (role: "owner" | "customer") => {
+    if (!selectedRole) return;
+    
     setLoading(true);
     try {
-      if (isGoogleSignup) {
-        const resultUserData = await loginWithGoogle(role);
-        if (resultUserData) {
-          toast({
-            title: "Account created!",
-            description: "Welcome to Gourmet Haven.",
-          });
-          setLocation(resultUserData.role === "owner" ? "/dashboard" : "/menu");
-        }
-      } else if (pendingCredentials) {
-        await signup(pendingCredentials.email, pendingCredentials.password, pendingCredentials.displayName, role);
+      await signup(email, password, displayName, selectedRole);
+      localStorage.removeItem("selectedRole");
+      toast({
+        title: "Account created!",
+        description: "Welcome to Gourmet Haven.",
+      });
+      setLocation(selectedRole === "owner" ? "/dashboard" : "/menu");
+    } catch (error: any) {
+      toast({
+        title: "Signup failed",
+        description: error.message || "An error occurred during signup.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignup = async () => {
+    if (!selectedRole) return;
+    
+    setLoading(true);
+    try {
+      const resultUserData = await loginWithGoogle(selectedRole);
+      if (resultUserData) {
+        localStorage.removeItem("selectedRole");
         toast({
           title: "Account created!",
           description: "Welcome to Gourmet Haven.",
         });
-        setLocation(role === "owner" ? "/dashboard" : "/menu");
+        setLocation(resultUserData.role === "owner" ? "/dashboard" : "/menu");
       }
     } catch (error: any) {
       toast({
@@ -61,11 +79,12 @@ export default function Signup() {
       });
     } finally {
       setLoading(false);
-      setShowRoleSelector(false);
-      setPendingCredentials(null);
-      setIsGoogleSignup(false);
     }
   };
+
+  if (!selectedRole) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
@@ -138,16 +157,8 @@ export default function Signup() {
             Sign up with Google
           </Button>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            Already have an account?{" "}
-            <Link href="/login" className="text-primary font-medium hover:underline" data-testid="link-login">
-              Sign in
-            </Link>
-          </p>
         </CardContent>
       </Card>
-
-      <RoleSelector isOpen={showRoleSelector} onSelect={handleRoleSelect} />
     </div>
   );
 }

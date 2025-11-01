@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "wouter";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,28 +8,53 @@ import { Separator } from "@/components/ui/separator";
 import { SiGoogle } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import RoleSelector from "@/components/RoleSelector";
+import OwnerPinModal from "@/components/OwnerPinModal";
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  const { login, loginWithGoogle, userData } = useAuth();
+  const { login, loginWithGoogle, userData, logout } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showRoleSelector, setShowRoleSelector] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<"owner" | "customer" | null>(null);
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [pinVerified, setPinVerified] = useState(false);
+
+  useEffect(() => {
+    const role = localStorage.getItem("selectedRole") as "owner" | "customer" | null;
+    if (role) {
+      setSelectedRole(role);
+    } else {
+      setLocation("/");
+      toast({
+        title: "Please select a role",
+        description: "Click Login button to select your role first.",
+        variant: "destructive",
+      });
+    }
+  }, [setLocation, toast]);
 
   useEffect(() => {
     if (userData) {
-      setLocation(userData.role === "owner" ? "/dashboard" : "/menu");
+      if (userData.role === "owner" && !pinVerified) {
+        setShowPinModal(true);
+      } else if (userData.role === "customer") {
+        setLocation("/menu");
+      } else if (userData.role === "owner" && pinVerified) {
+        setLocation("/dashboard");
+      }
     }
-  }, [userData, setLocation]);
+  }, [userData, pinVerified, setLocation]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedRole) return;
+    
     setLoading(true);
     try {
       await login(email, password);
+      localStorage.removeItem("selectedRole");
       toast({
         title: "Welcome back!",
         description: "You've successfully logged in.",
@@ -46,13 +71,13 @@ export default function Login() {
   };
 
   const handleGoogleLogin = async () => {
+    if (!selectedRole) return;
+    
     setLoading(true);
     try {
-      const resultUserData = await loginWithGoogle();
-      if (!resultUserData) {
-        setShowRoleSelector(true);
-        setLoading(false);
-      } else {
+      const resultUserData = await loginWithGoogle(selectedRole);
+      if (resultUserData) {
+        localStorage.removeItem("selectedRole");
         toast({
           title: "Welcome back!",
           description: "You've successfully logged in with Google.",
@@ -64,39 +89,33 @@ export default function Login() {
         description: error.message || "An error occurred during Google sign-in.",
         variant: "destructive",
       });
-      setLoading(false);
-    }
-  };
-
-  const handleRoleSelect = async (role: "owner" | "customer") => {
-    setLoading(true);
-    try {
-      const resultUserData = await loginWithGoogle(role);
-      if (resultUserData) {
-        toast({
-          title: "Welcome!",
-          description: "Your account has been created successfully.",
-        });
-        setLocation(resultUserData.role === "owner" ? "/dashboard" : "/menu");
-      }
-    } catch (error: any) {
-      toast({
-        title: "Setup failed",
-        description: error.message || "Failed to complete account setup.",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
-      setShowRoleSelector(false);
     }
   };
 
-  if (showRoleSelector) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-12">
-        <RoleSelector isOpen={showRoleSelector} onSelect={handleRoleSelect} />
-      </div>
-    );
+  const handlePinSuccess = () => {
+    setPinVerified(true);
+    setShowPinModal(false);
+    toast({
+      title: "Access granted",
+      description: "Welcome to the Owner Dashboard.",
+    });
+  };
+
+  const handlePinCancel = async () => {
+    setShowPinModal(false);
+    await logout();
+    setLocation("/");
+    toast({
+      title: "Login cancelled",
+      description: "PIN verification was cancelled.",
+      variant: "destructive",
+    });
+  };
+
+  if (!selectedRole) {
+    return null;
   }
 
   return (
@@ -155,15 +174,13 @@ export default function Login() {
             <SiGoogle className="mr-2 h-4 w-4" />
             Sign in with Google
           </Button>
-
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            Don't have an account?{" "}
-            <Link href="/signup" className="text-primary font-medium hover:underline" data-testid="link-signup">
-              Sign up
-            </Link>
-          </p>
         </CardContent>
       </Card>
+      <OwnerPinModal
+        isOpen={showPinModal}
+        onSuccess={handlePinSuccess}
+        onCancel={handlePinCancel}
+      />
     </div>
   );
 }

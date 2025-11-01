@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LogOut, ShoppingCart, UtensilsCrossed } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useState } from "react";
+import RoleSelectionModal from "./RoleSelectionModal";
 
 interface NavbarProps {
   user?: {
@@ -14,8 +16,25 @@ interface NavbarProps {
 }
 
 export default function Navbar({ user, onLogout }: NavbarProps) {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { itemCount } = useCart();
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+
+  const handleLoginClick = () => {
+    setAuthMode("login");
+    setShowRoleModal(true);
+  };
+
+  const handleSignupClick = () => {
+    setAuthMode("signup");
+    setShowRoleModal(true);
+  };
+
+  const handleRoleSelect = (role: "owner" | "customer") => {
+    setShowRoleModal(false);
+    setLocation(authMode === "login" ? "/login" : "/signup");
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b shadow-sm">
@@ -33,21 +52,6 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
           </Link>
 
           <div className="flex items-center gap-6">
-            <Link 
-              href="/"
-              data-testid="link-nav-home"
-              className={`text-sm font-medium hover:text-[#D4AF37] transition-colors ${location === "/" ? "text-[#D4AF37]" : "text-foreground"}`}
-            >
-              Home
-            </Link>
-            <Link 
-              href="/menu"
-              data-testid="link-nav-menu"
-              className={`text-sm font-medium hover:text-[#D4AF37] transition-colors ${location === "/menu" ? "text-[#D4AF37]" : "text-foreground"}`}
-            >
-              Menu
-            </Link>
-            
             {user ? (
               <>
                 <span className="text-sm text-muted-foreground" data-testid="text-welcome-user">
@@ -96,21 +100,34 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
               </>
             ) : (
               <>
-                <Link href="/login" data-testid="link-login">
-                  <Button variant="ghost" size="sm" className="hover:text-[#D4AF37]">
-                    Login
-                  </Button>
-                </Link>
-                <Link href="/signup" data-testid="link-signup">
-                  <Button size="sm" className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white">
-                    Sign Up
-                  </Button>
-                </Link>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="hover:text-[#D4AF37]"
+                  onClick={handleLoginClick}
+                  data-testid="button-login"
+                >
+                  Login
+                </Button>
+                <Button 
+                  size="sm" 
+                  className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white"
+                  onClick={handleSignupClick}
+                  data-testid="button-signup"
+                >
+                  Sign Up
+                </Button>
               </>
             )}
           </div>
         </div>
       </div>
+      <RoleSelectionModal
+        isOpen={showRoleModal}
+        onClose={() => setShowRoleModal(false)}
+        onSelectRole={handleRoleSelect}
+        mode={authMode}
+      />
     </nav>
   );
 }
