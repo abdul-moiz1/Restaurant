@@ -9,7 +9,7 @@ import MenuCard from "@/components/MenuCard";
 import Footer from "@/components/Footer";
 import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import heroImage from "@assets/generated_images/Restaurant_hero_background_image_62e3db83.png";
+import heroImage from "@assets/generated_images/Luxury_restaurant_dark_ambiance_b9b12075.png";
 import { ChevronDown, UtensilsCrossed, MapPin, Phone, Mail } from "lucide-react";
 
 interface Dish {
