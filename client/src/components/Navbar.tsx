@@ -46,7 +46,7 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
             className="text-xl font-serif font-bold flex items-center gap-2 group"
           >
             <UtensilsCrossed className="w-6 h-6 text-[#D4AF37] group-hover:scale-110 transition-transform" />
-            <span className="text-[#D4AF37] font-bold">
+            <span className="bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37] bg-clip-text text-transparent animate-shimmer-text">
               Gourmet Haven
             </span>
           </Link>
