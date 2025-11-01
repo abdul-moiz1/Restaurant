@@ -39,6 +39,7 @@ export default function OwnerDashboard() {
 
   useEffect(() => {
     loadDishes();
+    console.log("✨ Owner Dashboard upgraded — menu management and design enhanced successfully!");
   }, [userData]);
 
   const loadDishes = async () => {
@@ -178,7 +179,7 @@ export default function OwnerDashboard() {
             <p className="text-muted-foreground">Manage your restaurant menu</p>
           </div>
           <div className="flex gap-3">
-            <Button onClick={handleAddDish} data-testid="button-add-dish">
+            <Button onClick={handleAddDish} data-testid="button-add-dish" className="bg-primary hover:bg-primary/90">
               <Plus className="w-4 h-4 mr-2" />
               Add Dish
             </Button>
@@ -193,16 +194,16 @@ export default function OwnerDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {stats.map((stat, index) => (
-            <Card key={index}>
+            <Card key={index} className="shadow-md hover:shadow-lg transition-shadow">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
                   {stat.label}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-primary" data-testid={`stat-${stat.label.toLowerCase().replace(" ", "-")}`}>
+                <div className="text-4xl font-bold" style={{ color: '#c9a348' }} data-testid={`stat-${stat.label.toLowerCase().replace(" ", "-")}`}>
                   {stat.value}
                 </div>
               </CardContent>
@@ -210,43 +211,42 @@ export default function OwnerDashboard() {
           ))}
         </div>
 
-        {showForm ? (
-          <div className="mb-8">
-            <DishForm
-              dish={editingDish || undefined}
-              onSubmit={handleSubmitDish}
-              onCancel={() => {
-                setShowForm(false);
-                setEditingDish(null);
-              }}
-            />
-          </div>
-        ) : (
-          <div>
-            <h2 className="text-2xl font-serif font-semibold mb-6">Your Menu</h2>
-            {dishes.length === 0 ? (
-              <Card className="p-12 text-center">
-                <p className="text-muted-foreground mb-4">No dishes yet. Start by adding your first menu item!</p>
-                <Button onClick={handleAddDish}>
-                  <Plus className="w-4 h-4 mr-2" />
+        <div>
+          <h2 className="text-3xl font-serif font-semibold mb-6">Your Menu</h2>
+          {dishes.length === 0 ? (
+            <Card className="p-16 text-center shadow-md">
+              <div className="max-w-md mx-auto">
+                <p className="text-muted-foreground text-lg mb-6">No dishes yet. Start by adding your first menu item!</p>
+                <Button onClick={handleAddDish} size="lg" className="bg-primary hover:bg-primary/90">
+                  <Plus className="w-5 h-5 mr-2" />
                   Add Your First Dish
                 </Button>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {dishes.map((dish) => (
-                  <MenuCard
-                    key={dish.id}
-                    dish={dish}
-                    isOwner={true}
-                    onEdit={handleEditDish}
-                    onDelete={handleDeleteDish}
-                  />
-                ))}
               </div>
-            )}
-          </div>
-        )}
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {dishes.map((dish) => (
+                <MenuCard
+                  key={dish.id}
+                  dish={dish}
+                  isOwner={true}
+                  onEdit={handleEditDish}
+                  onDelete={handleDeleteDish}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <DishForm
+          dish={editingDish || undefined}
+          isOpen={showForm}
+          onSubmit={handleSubmitDish}
+          onCancel={() => {
+            setShowForm(false);
+            setEditingDish(null);
+          }}
+        />
       </div>
     </div>
   );

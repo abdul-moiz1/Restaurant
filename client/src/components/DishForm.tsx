@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,19 +16,42 @@ interface DishFormProps {
     tags: string[];
     available: boolean;
   };
+  isOpen: boolean;
   onSubmit: (dish: any) => void;
-  onCancel?: () => void;
+  onCancel: () => void;
 }
 
-export default function DishForm({ dish, onSubmit, onCancel }: DishFormProps) {
+export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormProps) {
   const [formData, setFormData] = useState({
-    name: dish?.name || "",
-    description: dish?.description || "",
-    price: dish?.price || 0,
-    imageUrl: dish?.imageUrl || "",
-    tags: dish?.tags?.join(", ") || "",
-    available: dish?.available ?? true,
+    name: "",
+    description: "",
+    price: 0,
+    imageUrl: "",
+    tags: "",
+    available: true,
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        name: dish?.name || "",
+        description: dish?.description || "",
+        price: dish?.price || 0,
+        imageUrl: dish?.imageUrl || "",
+        tags: dish?.tags?.join(", ") || "",
+        available: dish?.available ?? true,
+      });
+    } else {
+      setFormData({
+        name: "",
+        description: "",
+        price: 0,
+        imageUrl: "",
+        tags: "",
+        available: true,
+      });
+    }
+  }, [isOpen, dish?.id, dish?.name, dish?.description, dish?.price, dish?.imageUrl, dish?.tags, dish?.available]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,17 +60,25 @@ export default function DishForm({ dish, onSubmit, onCancel }: DishFormProps) {
       tags: formData.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
       price: Number(formData.price),
     });
+    setFormData({
+      name: "",
+      description: "",
+      price: 0,
+      imageUrl: "",
+      tags: "",
+      available: true,
+    });
   };
 
   return (
-    <Card className="max-w-2xl">
-      <CardHeader>
-        <CardTitle className="text-2xl font-serif">
-          {dish?.id ? "Edit Dish" : "Add New Dish"}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-serif">
+            {dish?.id ? "Edit Dish" : "Add New Dish"}
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-6 pt-4">
           <div className="space-y-2">
             <Label htmlFor="name">Dish Name *</Label>
             <Input
@@ -73,18 +104,31 @@ export default function DishForm({ dish, onSubmit, onCancel }: DishFormProps) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="price">Price ($) *</Label>
-            <Input
-              id="price"
-              type="number"
-              step="0.01"
-              data-testid="input-dish-price"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
-              placeholder="0.00"
-              required
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="price">Price ($) *</Label>
+              <Input
+                id="price"
+                type="number"
+                step="0.01"
+                data-testid="input-dish-price"
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
+                placeholder="0.00"
+                required
+              />
+            </div>
+            <div className="flex items-end">
+              <div className="flex items-center gap-3 h-10">
+                <Label htmlFor="available">Available</Label>
+                <Switch
+                  id="available"
+                  data-testid="switch-dish-available"
+                  checked={formData.available}
+                  onCheckedChange={(checked) => setFormData({ ...formData, available: checked })}
+                />
+              </div>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -98,6 +142,19 @@ export default function DishForm({ dish, onSubmit, onCancel }: DishFormProps) {
               placeholder="https://example.com/image.jpg"
               required
             />
+            {formData.imageUrl && (
+              <div className="mt-3 rounded-lg overflow-hidden border-2 border-primary/20">
+                <img
+                  src={formData.imageUrl}
+                  alt="Preview"
+                  className="w-full h-48 object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400';
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -107,34 +164,35 @@ export default function DishForm({ dish, onSubmit, onCancel }: DishFormProps) {
               data-testid="input-dish-tags"
               value={formData.tags}
               onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-              placeholder="e.g., Italian, Vegetarian, Gluten-Free"
+              placeholder="e.g., Vegan, Spicy, Italian"
             />
+            {formData.tags && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {formData.tags.split(",").map((tag, index) => (
+                  tag.trim() && (
+                    <span
+                      key={index}
+                      className="px-2.5 py-1 rounded-full text-xs font-medium"
+                      style={{ backgroundColor: '#c9a348', color: '#fff' }}
+                    >
+                      {tag.trim()}
+                    </span>
+                  )
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Label htmlFor="available">Available</Label>
-              <Switch
-                id="available"
-                data-testid="switch-dish-available"
-                checked={formData.available}
-                onCheckedChange={(checked) => setFormData({ ...formData, available: checked })}
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-3">
+          <div className="flex gap-3 pt-4">
             <Button type="submit" className="flex-1" data-testid="button-submit-dish">
               {dish?.id ? "Update Dish" : "Add Dish"}
             </Button>
-            {onCancel && (
-              <Button type="button" variant="outline" onClick={onCancel} data-testid="button-cancel">
-                Cancel
-              </Button>
-            )}
+            <Button type="button" variant="outline" onClick={onCancel} data-testid="button-cancel">
+              Cancel
+            </Button>
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </DialogContent>
+    </Dialog>
   );
 }
