@@ -118,22 +118,22 @@ export default function Home() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
         
-        <div className="absolute top-12 left-1/2 -translate-x-1/2 animate-glow">
-          <UtensilsCrossed className="w-16 h-16 text-[#D4AF37]" />
+        <div className="absolute top-12 left-1/2 -translate-x-1/2">
+          <UtensilsCrossed className="w-12 h-12 text-[#D4AF37] transition-transform hover:scale-110" />
         </div>
 
-        <div className="relative z-10 text-center text-white max-w-4xl px-4">
-          <h1 className="text-5xl lg:text-7xl font-serif font-bold mb-6 tracking-tight animate-fade-up">
-            Welcome to Gourmet Haven 🍽️
+        <div className="relative z-10 text-center text-white max-w-3xl px-4">
+          <h1 className="text-4xl lg:text-6xl font-serif font-bold mb-6 tracking-tight animate-fade-up">
+            Welcome to Gourmet Haven
           </h1>
-          <p className="text-xl lg:text-2xl mb-8 text-white/90 font-light animate-fade-up" style={{ animationDelay: '0.2s' }}>
+          <p className="text-lg lg:text-xl mb-10 text-white/90 font-light animate-fade-up" style={{ animationDelay: '0.2s' }}>
             Experience Fine Dining at Home
           </p>
           <div className="flex justify-center items-center animate-fade-up" style={{ animationDelay: '0.4s' }}>
             <Link href="/menu">
               <Button
                 size="lg"
-                className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white px-12 py-6 text-lg rounded-lg shadow-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(212,175,55,0.6)] hover:scale-105"
+                className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white px-10 py-3 text-base font-medium rounded-lg shadow-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(212,175,55,0.6)] hover:scale-105"
                 data-testid="button-view-menu"
               >
                 View Menu
