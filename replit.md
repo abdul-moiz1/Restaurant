@@ -6,7 +6,21 @@ Gourmet Haven is a dual-role restaurant platform built with React and Firebase t
 
 ## Recent Changes (November 2025)
 
-**Latest Update: Fixed DishForm for Complete Filtering Functionality**
+**Latest Update: Authentication & Navigation Refactoring**
+- Simplified navbar by removing Home and Menu links - now shows only logo and Login/Sign Up buttons
+- Implemented RoleSelectionModal component that appears when clicking Login or Sign Up buttons
+- Users must select their role (Owner or Customer) before accessing authentication forms
+- Selected role is stored in localStorage and used throughout the authentication flow
+- Added OwnerPinModal component for enhanced owner security
+- Owner accounts require a 4-digit PIN (from VITE_OWNER_PIN env variable) after successful login
+- PIN verification required before accessing Owner Dashboard - incorrect PIN logs user out
+- Improved Footer component design with better spacing, larger icons, and hover effects
+- Enhanced contact information with hover animations and transitions
+- Updated Footer to use consistent gold (#D4AF37) and ivory (#FFFFF0) theme colors
+- Verified customers can browse and filter menu without login (checkout requires authentication)
+- All existing Owner Dashboard CRUD operations preserved and functional
+
+**Previous Update: Fixed DishForm for Complete Filtering Functionality**
 - Added cuisineType and dietary fields to DishForm state and submission
 - Implemented Select dropdown for cuisine type selection (Italian, Asian, American, Mediterranean, Desserts, Mexican, French)
 - Added Checkbox inputs for dietary preferences (Vegan, Keto, Gluten-Free, Vegetarian)
