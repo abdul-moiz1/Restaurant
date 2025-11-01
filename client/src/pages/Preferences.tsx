@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
@@ -9,41 +8,56 @@ import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import toast from "react-hot-toast";
 
-const allergenOptions = [
-  "Gluten",
-  "Dairy",
-  "Nuts",
-  "Shellfish",
-  "Eggs",
-  "Soy",
-  "Fish",
+const healthOptions = [
+  "Low Sugar",
+  "High Protein",
+  "Low Carb",
+  "Low Sodium",
+  "Heart Healthy",
+  "High Fiber",
+  "Diabetic Friendly",
+];
+
+const dietaryOptions = [
+  "Vegetarian",
+  "Vegan",
+  "Keto",
+  "Gluten-Free",
 ];
 
 export default function Preferences() {
-  const [dietaryType, setDietaryType] = useState("all");
-  const [allergens, setAllergens] = useState<string[]>([]);
-  const [spiceLevel, setSpiceLevel] = useState([2]);
+  const [healthFilters, setHealthFilters] = useState<string[]>([]);
+  const [dietaryFilters, setDietaryFilters] = useState<string[]>([]);
+  const [calorieRange, setCalorieRange] = useState([100, 1000]);
 
-  const toggleAllergen = (allergen: string) => {
-    setAllergens((prev) =>
-      prev.includes(allergen)
-        ? prev.filter((a) => a !== allergen)
-        : [...prev, allergen]
+  const toggleHealth = (health: string) => {
+    setHealthFilters((prev) =>
+      prev.includes(health)
+        ? prev.filter((h) => h !== health)
+        : [...prev, health]
+    );
+  };
+
+  const toggleDietary = (dietary: string) => {
+    setDietaryFilters((prev) =>
+      prev.includes(dietary)
+        ? prev.filter((d) => d !== dietary)
+        : [...prev, dietary]
     );
   };
 
   const handleSavePreferences = () => {
     localStorage.setItem(
       "preferences",
-      JSON.stringify({ dietaryType, allergens, spiceLevel: spiceLevel[0] })
+      JSON.stringify({ healthFilters, dietaryFilters, calorieRange })
     );
-    toast.success("Preferences saved successfully!");
+    toast.success("Health preferences saved successfully!");
   };
 
   const handleClearPreferences = () => {
-    setDietaryType("all");
-    setAllergens([]);
-    setSpiceLevel([2]);
+    setHealthFilters([]);
+    setDietaryFilters([]);
+    setCalorieRange([100, 1000]);
     localStorage.removeItem("preferences");
     toast.success("Preferences cleared!");
   };
@@ -53,52 +67,61 @@ export default function Preferences() {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-serif font-bold mb-4" data-testid="text-preferences-title">
-            Dining Preferences
+            Health & Nutrition Preferences
           </h1>
           <p className="text-lg text-muted-foreground">
-            Customize your menu based on your dietary needs and preferences
+            Customize your menu based on your health and dietary needs
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Set Your Preferences</CardTitle>
+            <CardTitle className="font-serif">Set Your Preferences</CardTitle>
             <CardDescription>
-              Filter the menu to show dishes that match your dietary requirements
+              Filter the menu to show dishes that match your health and dietary requirements
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-3">
-              <Label htmlFor="dietary-type">Dietary Type</Label>
-              <Select value={dietaryType} onValueChange={setDietaryType}>
-                <SelectTrigger id="dietary-type" data-testid="select-dietary-type">
-                  <SelectValue placeholder="Select dietary preference" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">No Restriction</SelectItem>
-                  <SelectItem value="Vegan">Vegan</SelectItem>
-                  <SelectItem value="Vegetarian">Vegetarian</SelectItem>
-                  <SelectItem value="Pescatarian">Pescatarian</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label className="text-base font-serif font-bold text-[#D4AF37]">Health & Nutrition Filters</Label>
+              <div className="grid grid-cols-2 gap-4">
+                {healthOptions.map((health) => (
+                  <div key={health} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`pref-health-${health}`}
+                      checked={healthFilters.includes(health)}
+                      onCheckedChange={() => toggleHealth(health)}
+                      data-testid={`checkbox-health-${health.toLowerCase().replace(/\s+/g, '-')}`}
+                      className="data-[state=checked]:bg-[#D4AF37] data-[state=checked]:border-[#D4AF37]"
+                    />
+                    <Label
+                      htmlFor={`pref-health-${health}`}
+                      className="text-sm font-normal cursor-pointer"
+                    >
+                      {health}
+                    </Label>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-3">
-              <Label>Allergens to Avoid</Label>
+              <Label className="text-base font-medium">Dietary Filters</Label>
               <div className="grid grid-cols-2 gap-4">
-                {allergenOptions.map((allergen) => (
-                  <div key={allergen} className="flex items-center space-x-2">
+                {dietaryOptions.map((dietary) => (
+                  <div key={dietary} className="flex items-center space-x-2">
                     <Checkbox
-                      id={allergen}
-                      checked={allergens.includes(allergen)}
-                      onCheckedChange={() => toggleAllergen(allergen)}
-                      data-testid={`checkbox-allergen-${allergen.toLowerCase()}`}
+                      id={`pref-dietary-${dietary}`}
+                      checked={dietaryFilters.includes(dietary)}
+                      onCheckedChange={() => toggleDietary(dietary)}
+                      data-testid={`checkbox-dietary-${dietary.toLowerCase()}`}
+                      className="data-[state=checked]:bg-[#D4AF37] data-[state=checked]:border-[#D4AF37]"
                     />
                     <Label
-                      htmlFor={allergen}
+                      htmlFor={`pref-dietary-${dietary}`}
                       className="text-sm font-normal cursor-pointer"
                     >
-                      {allergen}
+                      {dietary}
                     </Label>
                   </div>
                 ))}
@@ -107,23 +130,23 @@ export default function Preferences() {
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label>Spice Level Tolerance</Label>
-                <span className="text-sm font-medium" data-testid="text-spice-level">
-                  Level {spiceLevel[0]} / 5
+                <Label className="text-base font-medium">Calorie Range per Dish</Label>
+                <span className="text-sm font-medium text-[#D4AF37]" data-testid="text-calorie-range">
+                  {calorieRange[0]} - {calorieRange[1] >= 1000 ? '1000+' : calorieRange[1]} kcal
                 </span>
               </div>
               <Slider
-                value={spiceLevel}
-                onValueChange={setSpiceLevel}
-                max={5}
-                min={0}
-                step={1}
-                className="w-full"
-                data-testid="slider-spice-level"
+                value={calorieRange}
+                onValueChange={setCalorieRange}
+                max={1000}
+                min={100}
+                step={50}
+                className="w-full [&_[role=slider]]:bg-[#D4AF37] [&_[role=slider]]:border-[#D4AF37]"
+                data-testid="slider-calorie-range"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Mild</span>
-                <span>Hot</span>
+                <span>100 kcal</span>
+                <span>1000+ kcal</span>
               </div>
             </div>
 

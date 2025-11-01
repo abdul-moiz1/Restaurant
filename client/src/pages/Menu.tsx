@@ -23,6 +23,8 @@ interface Dish {
   available: boolean;
   cuisineType?: string;
   dietary?: string[];
+  healthTags?: string[];
+  calories?: number;
   ownerId?: string;
 }
 
@@ -32,16 +34,16 @@ export default function Menu() {
   const [filteredDishes, setFilteredDishes] = useState<Dish[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [cuisineType, setCuisineType] = useState<string>("all");
+  const [healthFilters, setHealthFilters] = useState<string[]>([]);
   const [dietaryFilters, setDietaryFilters] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<number[]>([0, 100]);
+  const [calorieRange, setCalorieRange] = useState<number[]>([100, 1000]);
   const [showFilters, setShowFilters] = useState(true);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const dietary = params.get('dietary');
-    const minPrice = params.get('minPrice');
-    const maxPrice = params.get('maxPrice');
+    const minCalories = params.get('minCalories');
+    const maxCalories = params.get('maxCalories');
 
     if (dietary) {
       const dietaryOptions = dietary.split(',').filter(d => d);
@@ -49,10 +51,10 @@ export default function Menu() {
         setDietaryFilters(dietaryOptions);
       }
     }
-    if (minPrice || maxPrice) {
-      setPriceRange([
-        minPrice ? parseInt(minPrice) : 0,
-        maxPrice ? parseInt(maxPrice) : 100,
+    if (minCalories || maxCalories) {
+      setCalorieRange([
+        minCalories ? parseInt(minCalories) : 100,
+        maxCalories ? parseInt(maxCalories) : 1000,
       ]);
     }
 
@@ -61,7 +63,7 @@ export default function Menu() {
 
   useEffect(() => {
     filterDishes();
-  }, [searchTerm, cuisineType, dietaryFilters, dishes, priceRange]);
+  }, [searchTerm, healthFilters, dietaryFilters, dishes, calorieRange]);
 
   const loadDishes = async () => {
     try {
@@ -91,8 +93,11 @@ export default function Menu() {
       );
     }
 
-    if (cuisineType && cuisineType !== "all") {
-      filtered = filtered.filter((dish) => dish.cuisineType === cuisineType);
+    if (healthFilters.length > 0) {
+      filtered = filtered.filter((dish) => {
+        if (!dish.healthTags || dish.healthTags.length === 0) return true;
+        return dish.healthTags.some((h) => healthFilters.includes(h));
+      });
     }
 
     if (dietaryFilters.length > 0) {
@@ -101,9 +106,12 @@ export default function Menu() {
       );
     }
 
-    filtered = filtered.filter(
-      (dish) => dish.price >= priceRange[0] && dish.price <= priceRange[1]
-    );
+    if (calorieRange && (calorieRange[0] > 100 || calorieRange[1] < 1000)) {
+      filtered = filtered.filter((dish) => {
+        if (!dish.calories) return true;
+        return dish.calories >= calorieRange[0] && dish.calories <= calorieRange[1];
+      });
+    }
 
     setFilteredDishes(filtered);
   };
@@ -116,14 +124,22 @@ export default function Menu() {
     );
   };
 
-  const clearFilters = () => {
-    setSearchTerm("");
-    setCuisineType("all");
-    setDietaryFilters([]);
-    setPriceRange([0, 100]);
+  const toggleHealth = (health: string) => {
+    setHealthFilters(prev =>
+      prev.includes(health)
+        ? prev.filter(h => h !== health)
+        : [...prev, health]
+    );
   };
 
-  const hasActiveFilters = searchTerm || cuisineType !== "all" || dietaryFilters.length > 0 || priceRange[0] > 0 || priceRange[1] < 100;
+  const clearFilters = () => {
+    setSearchTerm("");
+    setHealthFilters([]);
+    setDietaryFilters([]);
+    setCalorieRange([100, 1000]);
+  };
+
+  const hasActiveFilters = searchTerm || healthFilters.length > 0 || dietaryFilters.length > 0 || calorieRange[0] > 100 || calorieRange[1] < 1000;
 
   return (
     <div className="min-h-screen">
@@ -169,24 +185,27 @@ export default function Menu() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
-                    <Label className="text-sm font-medium mb-3 block">Cuisine Type</Label>
-                    <Select value={cuisineType} onValueChange={setCuisineType}>
-                      <SelectTrigger data-testid="select-cuisine">
-                        <SelectValue placeholder="All Cuisines" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Cuisines</SelectItem>
-                        <SelectItem value="Italian">Italian</SelectItem>
-                        <SelectItem value="Asian">Asian</SelectItem>
-                        <SelectItem value="Desserts">Desserts</SelectItem>
-                        <SelectItem value="American">American</SelectItem>
-                        <SelectItem value="Mediterranean">Mediterranean</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label className="text-sm font-serif font-bold mb-3 block text-[#D4AF37]">Health & Nutrition Filters</Label>
+                    <div className="space-y-2">
+                      {['Low Sugar', 'High Protein', 'Low Carb', 'Low Sodium', 'Heart Healthy', 'High Fiber', 'Diabetic Friendly'].map((health) => (
+                        <div key={health} className="flex items-center gap-2">
+                          <Checkbox
+                            id={`health-${health}`}
+                            checked={healthFilters.includes(health)}
+                            onCheckedChange={() => toggleHealth(health)}
+                            data-testid={`checkbox-health-${health.toLowerCase().replace(/\s+/g, '-')}`}
+                            className="data-[state=checked]:bg-[#D4AF37] data-[state=checked]:border-[#D4AF37]"
+                          />
+                          <Label htmlFor={`health-${health}`} className="cursor-pointer text-sm">
+                            {health}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <div>
-                    <Label className="text-sm font-medium mb-3 block">Dietary Preferences</Label>
+                    <Label className="text-sm font-medium mb-3 block">Dietary Filters</Label>
                     <div className="space-y-2">
                       {['Vegetarian', 'Vegan', 'Keto', 'Gluten-Free'].map((dietary) => (
                         <div key={dietary} className="flex items-center gap-2">
@@ -195,6 +214,7 @@ export default function Menu() {
                             checked={dietaryFilters.includes(dietary)}
                             onCheckedChange={() => toggleDietary(dietary)}
                             data-testid={`checkbox-dietary-${dietary.toLowerCase()}`}
+                            className="data-[state=checked]:bg-[#D4AF37] data-[state=checked]:border-[#D4AF37]"
                           />
                           <Label htmlFor={`dietary-${dietary}`} className="cursor-pointer text-sm">
                             {dietary}
@@ -205,25 +225,26 @@ export default function Menu() {
                   </div>
 
                   <div>
-                    <Label className="text-sm font-medium mb-3 block">Price Range per Dish</Label>
+                    <Label className="text-sm font-medium mb-3 block">Calorie Range per Dish</Label>
                     <div className="space-y-4">
                       <Slider
-                        min={0}
-                        max={100}
-                        step={5}
-                        value={priceRange}
-                        onValueChange={setPriceRange}
-                        data-testid="slider-price-range"
+                        min={100}
+                        max={1000}
+                        step={50}
+                        value={calorieRange}
+                        onValueChange={setCalorieRange}
+                        data-testid="slider-calorie-range"
+                        className="[&_[role=slider]]:bg-[#D4AF37] [&_[role=slider]]:border-[#D4AF37] [&_.slider-track]:bg-[#D4AF37]/30 [&_.slider-range]:bg-[#D4AF37]"
                       />
                       <div className="flex justify-between items-center">
                         <div className="flex flex-col">
                           <span className="text-xs text-muted-foreground">Min</span>
-                          <span className="text-sm font-semibold text-[#D4AF37]" data-testid="text-price-min">${priceRange[0]}</span>
+                          <span className="text-sm font-semibold text-[#D4AF37]" data-testid="text-calorie-min">{calorieRange[0]} kcal</span>
                         </div>
                         <span className="text-muted-foreground text-xs">to</span>
                         <div className="flex flex-col text-right">
                           <span className="text-xs text-muted-foreground">Max</span>
-                          <span className="text-sm font-semibold text-[#D4AF37]" data-testid="text-price-max">${priceRange[1]}{priceRange[1] === 100 ? '+' : ''}</span>
+                          <span className="text-sm font-semibold text-[#D4AF37]" data-testid="text-calorie-max">{calorieRange[1] >= 1000 ? '1000+' : calorieRange[1]} kcal</span>
                         </div>
                       </div>
                     </div>

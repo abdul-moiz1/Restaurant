@@ -22,6 +22,8 @@ export const dishSchema = z.object({
   available: z.boolean(),
   cuisineType: z.string().optional(),
   dietary: z.array(z.string()).optional(),
+  healthTags: z.array(z.string()).optional(),
+  calories: z.number().optional(),
   ownerId: z.string().optional(),
 });
 
@@ -49,9 +51,9 @@ export type LoginData = z.infer<typeof loginSchema>;
 
 // Preferences Schema
 export const preferencesSchema = z.object({
-  dietaryType: z.string().optional(),
-  allergens: z.array(z.string()).optional(),
-  spiceLevel: z.number().min(0).max(5).optional(),
+  healthFilters: z.array(z.string()).optional(),
+  dietaryFilters: z.array(z.string()).optional(),
+  calorieRange: z.array(z.number()).optional(),
 });
 
 export type Preferences = z.infer<typeof preferencesSchema>;

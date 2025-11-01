@@ -17,6 +17,8 @@ interface MenuCardProps {
     available: boolean;
     cuisineType?: string;
     dietary?: string[];
+    healthTags?: string[];
+    calories?: number;
   };
   isOwner?: boolean;
   onEdit?: (id: string) => void;
@@ -28,6 +30,7 @@ export default function MenuCard({ dish, isOwner, onEdit, onDelete }: MenuCardPr
   const { userData } = useAuth();
   const { toast } = useToast();
   const isCustomer = userData?.role === "customer";
+  const isHealthyChoice = (dish.healthTags?.length || 0) >= 2;
 
   const handleAddToCart = () => {
     if (!userData) {
@@ -64,15 +67,18 @@ export default function MenuCard({ dish, isOwner, onEdit, onDelete }: MenuCardPr
             target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400';
           }}
         />
-        {dish.available ? (
-          <div className="absolute top-3 right-3">
+        <div className="absolute top-3 right-3 flex flex-col gap-2">
+          {isHealthyChoice && (
+            <Badge className="bg-green-600 text-white border-0 shadow-md">
+              Healthy Choice 🥦
+            </Badge>
+          )}
+          {dish.available ? (
             <Badge className="bg-green-500 text-white border-0 shadow-md">Available</Badge>
-          </div>
-        ) : (
-          <div className="absolute top-3 right-3">
+          ) : (
             <Badge className="bg-red-500 text-white border-0 shadow-md">Out of Stock</Badge>
-          </div>
-        )}
+          )}
+        </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
         <div className="absolute bottom-0 left-0 right-0 p-4 backdrop-blur-md bg-black/30 border-t border-white/10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-full group-hover:translate-y-0">
@@ -82,7 +88,7 @@ export default function MenuCard({ dish, isOwner, onEdit, onDelete }: MenuCardPr
         </div>
       </div>
       <CardContent className="p-6 flex flex-col">
-        <div className="flex items-start justify-between gap-3 mb-4">
+        <div className="flex items-start justify-between gap-3 mb-2">
           <h3 className="text-xl font-serif font-bold text-foreground" data-testid={`text-dish-name-${dish.id}`}>
             {dish.name}
           </h3>
@@ -93,16 +99,24 @@ export default function MenuCard({ dish, isOwner, onEdit, onDelete }: MenuCardPr
             ${dish.price.toFixed(2)}
           </span>
         </div>
+        {dish.calories && (
+          <p className="text-sm text-muted-foreground mb-4" data-testid={`text-calories-${dish.id}`}>
+            {dish.calories} kcal
+          </p>
+        )}
         <div className="flex flex-wrap gap-2 mt-auto">
-          {dish.cuisineType && (
-            <span className="px-3 py-1 rounded-full text-xs font-medium shadow-sm bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20">
-              {dish.cuisineType}
-            </span>
-          )}
           {dish.dietary?.map((tag, index) => (
             <span 
               key={index} 
               className="px-3 py-1 rounded-full text-xs font-medium shadow-sm bg-blue-500/10 text-blue-600 border border-blue-500/20"
+            >
+              {tag}
+            </span>
+          ))}
+          {dish.healthTags?.slice(0, 2).map((tag, index) => (
+            <span 
+              key={`health-${index}`} 
+              className="px-3 py-1 rounded-full text-xs font-medium shadow-sm bg-green-500/10 text-green-600 border border-green-500/20"
             >
               {tag}
             </span>
