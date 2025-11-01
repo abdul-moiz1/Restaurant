@@ -75,6 +75,14 @@ Preferred communication style: Simple, everyday language.
 - Menu items include: name, description, price, imageUrl, tags, available status, ownerId
 - Queries filtered by ownerId for owner-specific menu management
 
+**Firebase Storage**
+- Cloud storage for dish images uploaded by restaurant owners
+- Images stored in `dishes/` folder with timestamp-based naming
+- Supports drag-and-drop file upload with real-time preview
+- File validation: image types only (JPG, PNG, GIF), max 5MB
+- Upload progress tracking with visual feedback
+- Automatically generates public URLs for uploaded images
+
 **Storage Interface Pattern**
 - Abstract IStorage interface defines CRUD operations
 - MemStorage implementation for development/testing
