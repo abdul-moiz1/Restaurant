@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import MenuCard from "@/components/MenuCard";
 import PreferencesForm from "@/components/PreferencesForm";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
@@ -21,10 +22,12 @@ export default function CustomerDashboard() {
   const { toast } = useToast();
   const { userData } = useAuth();
   const [preferences, setPreferences] = useState({
-    vegan: false,
-    halal: false,
-    glutenFree: false,
-    spiceLevel: 3,
+    diet: "none",
+    vegetarian: false,
+    excludeGluten: false,
+    excludeNuts: false,
+    excludeDairy: false,
+    spiceLevel: 2,
   });
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [loading, setLoading] = useState(true);

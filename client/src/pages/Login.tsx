@@ -94,7 +94,7 @@ export default function Login() {
   if (showRoleSelector) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 py-12">
-        <RoleSelector onSelect={handleRoleSelect} />
+        <RoleSelector isOpen={showRoleSelector} onSelect={handleRoleSelect} />
       </div>
     );
   }
@@ -156,10 +156,8 @@ export default function Login() {
 
           <p className="text-center text-sm text-muted-foreground mt-6">
             Don't have an account?{" "}
-            <Link href="/signup">
-              <a className="text-primary font-medium hover:underline" data-testid="link-signup">
-                Sign up
-              </a>
+            <Link href="/signup" className="text-primary font-medium hover:underline" data-testid="link-signup">
+              Sign up
             </Link>
           </p>
         </CardContent>

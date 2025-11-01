@@ -123,10 +123,8 @@ export default function Signup() {
 
           <p className="text-center text-sm text-muted-foreground mt-6">
             Already have an account?{" "}
-            <Link href="/login">
-              <a className="text-primary font-medium hover:underline" data-testid="link-login">
-                Sign in
-              </a>
+            <Link href="/login" className="text-primary font-medium hover:underline" data-testid="link-login">
+              Sign in
             </Link>
           </p>
         </CardContent>
