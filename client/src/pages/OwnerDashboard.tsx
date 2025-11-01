@@ -1,47 +1,69 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MenuCard from "@/components/MenuCard";
 import DishForm from "@/components/DishForm";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { Plus } from "lucide-react";
-import pastaImage from "@assets/generated_images/Gourmet_pasta_dish_photo_bdc1e780.png";
-import salmonImage from "@assets/generated_images/Grilled_salmon_dish_photo_e47f8711.png";
-import pizzaImage from "@assets/generated_images/Artisan_pizza_photo_79500d48.png";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
+
+interface Dish {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  tags: string[];
+  available: boolean;
+  ownerId: string;
+}
 
 export default function OwnerDashboard() {
   const { toast } = useToast();
+  const { userData } = useAuth();
   const [showForm, setShowForm] = useState(false);
-  const [editingDish, setEditingDish] = useState<any>(null);
-  const [dishes, setDishes] = useState([
-    {
-      id: "1",
-      name: "Truffle Mushroom Pasta",
-      description: "Hand-made pasta with wild mushrooms, truffle oil, and parmesan",
-      price: 28.99,
-      imageUrl: pastaImage,
-      tags: ["Italian", "Vegetarian"],
-      available: true,
-    },
-    {
-      id: "2",
-      name: "Grilled Atlantic Salmon",
-      description: "Fresh Atlantic salmon with roasted vegetables and lemon butter sauce",
-      price: 34.99,
-      imageUrl: salmonImage,
-      tags: ["Seafood", "Gluten-Free"],
-      available: true,
-    },
-    {
-      id: "3",
-      name: "Artisan Wood-Fired Pizza",
-      description: "Classic Margherita with fresh mozzarella, basil, and San Marzano tomatoes",
-      price: 22.99,
-      imageUrl: pizzaImage,
-      tags: ["Italian", "Vegetarian"],
-      available: false,
-    },
-  ]);
+  const [editingDish, setEditingDish] = useState<Dish | null>(null);
+  const [dishes, setDishes] = useState<Dish[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadDishes();
+  }, [userData]);
+
+  const loadDishes = async () => {
+    if (!userData) return;
+    
+    setLoading(true);
+    try {
+      const q = query(collection(db, "menu"), where("ownerId", "==", userData.uid));
+      const querySnapshot = await getDocs(q);
+      const dishesData: Dish[] = [];
+      querySnapshot.forEach((doc) => {
+        dishesData.push({ id: doc.id, ...doc.data() } as Dish);
+      });
+      setDishes(dishesData);
+    } catch (error) {
+      console.error("Error loading dishes:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load menu items.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddDish = () => {
     setEditingDish(null);
@@ -50,37 +72,60 @@ export default function OwnerDashboard() {
 
   const handleEditDish = (id: string) => {
     const dish = dishes.find((d) => d.id === id);
-    setEditingDish(dish);
+    setEditingDish(dish || null);
     setShowForm(true);
   };
 
-  const handleDeleteDish = (id: string) => {
-    setDishes(dishes.filter((d) => d.id !== id));
-    toast({
-      title: "Dish Deleted",
-      description: "The dish has been removed from your menu.",
-    });
-    console.log("Deleted dish:", id);
-  };
-
-  const handleSubmitDish = (dishData: any) => {
-    if (editingDish) {
-      setDishes(dishes.map((d) => (d.id === editingDish.id ? { ...dishData, id: editingDish.id } : d)));
+  const handleDeleteDish = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "menu", id));
+      setDishes(dishes.filter((d) => d.id !== id));
       toast({
-        title: "Dish Updated",
-        description: "Your menu item has been updated successfully.",
+        title: "Dish Deleted",
+        description: "The dish has been removed from your menu.",
       });
-    } else {
-      const newDish = { ...dishData, id: String(Date.now()) };
-      setDishes([...dishes, newDish]);
+    } catch (error) {
+      console.error("Error deleting dish:", error);
       toast({
-        title: "Dish Added",
-        description: "New dish has been added to your menu.",
+        title: "Error",
+        description: "Failed to delete the dish.",
+        variant: "destructive",
       });
     }
-    console.log("Submitted dish:", dishData);
-    setShowForm(false);
-    setEditingDish(null);
+  };
+
+  const handleSubmitDish = async (dishData: any) => {
+    if (!userData) return;
+
+    try {
+      if (editingDish) {
+        await updateDoc(doc(db, "menu", editingDish.id), dishData);
+        setDishes(dishes.map((d) => (d.id === editingDish.id ? { ...dishData, id: editingDish.id, ownerId: userData.uid } : d)));
+        toast({
+          title: "Dish Updated",
+          description: "Your menu item has been updated successfully.",
+        });
+      } else {
+        const docRef = await addDoc(collection(db, "menu"), {
+          ...dishData,
+          ownerId: userData.uid,
+        });
+        setDishes([...dishes, { ...dishData, id: docRef.id, ownerId: userData.uid }]);
+        toast({
+          title: "Dish Added",
+          description: "New dish has been added to your menu.",
+        });
+      }
+      setShowForm(false);
+      setEditingDish(null);
+    } catch (error) {
+      console.error("Error saving dish:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save the dish.",
+        variant: "destructive",
+      });
+    }
   };
 
   const stats = [
@@ -88,6 +133,14 @@ export default function OwnerDashboard() {
     { label: "Available", value: dishes.filter((d) => d.available).length },
     { label: "Unavailable", value: dishes.filter((d) => !d.available).length },
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg text-muted-foreground">Loading your menu...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-12 px-4">
@@ -134,17 +187,27 @@ export default function OwnerDashboard() {
         ) : (
           <div>
             <h2 className="text-2xl font-serif font-semibold mb-6">Your Menu</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {dishes.map((dish) => (
-                <MenuCard
-                  key={dish.id}
-                  dish={dish}
-                  isOwner={true}
-                  onEdit={handleEditDish}
-                  onDelete={handleDeleteDish}
-                />
-              ))}
-            </div>
+            {dishes.length === 0 ? (
+              <Card className="p-12 text-center">
+                <p className="text-muted-foreground mb-4">No dishes yet. Start by adding your first menu item!</p>
+                <Button onClick={handleAddDish}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Your First Dish
+                </Button>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {dishes.map((dish) => (
+                  <MenuCard
+                    key={dish.id}
+                    dish={dish}
+                    isOwner={true}
+                    onEdit={handleEditDish}
+                    onDelete={handleDeleteDish}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
