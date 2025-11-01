@@ -269,37 +269,26 @@ export default function Home() {
                   <MenuCard key={dish.id} dish={dish} />
                 ))}
               </div>
-              {menuItems.length > 0 && (
-                <>
-                  <div className="text-center mt-12 mb-8">
+              {menuItems.length > 0 && previewItems.length > 0 && (
+                <div className="relative mt-12 overflow-hidden rounded-2xl">
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background pointer-events-none z-10" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 opacity-60 blur-[2px] scale-95">
+                    {previewItems.map((dish) => (
+                      <MenuCard key={dish.id} dish={dish} />
+                    ))}
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center z-20">
                     <Link href="/menu">
-                      <Button size="lg" variant="outline" data-testid="button-view-full-menu">
-                        View Full Menu
+                      <Button 
+                        size="lg" 
+                        className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white shadow-2xl backdrop-blur-sm"
+                        data-testid="button-view-full-menu"
+                      >
+                        Explore More Dishes
                       </Button>
                     </Link>
                   </div>
-                  
-                  {previewItems.length > 0 && (
-                    <div className="relative mt-8 overflow-hidden rounded-2xl">
-                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background pointer-events-none z-10" />
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 opacity-60 blur-[2px] scale-95">
-                        {previewItems.map((dish) => (
-                          <MenuCard key={dish.id} dish={dish} />
-                        ))}
-                      </div>
-                      <div className="absolute inset-0 flex items-center justify-center z-20">
-                        <Link href="/menu">
-                          <Button 
-                            size="lg" 
-                            className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white shadow-2xl backdrop-blur-sm"
-                          >
-                            Explore More Dishes
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  )}
-                </>
+                </div>
               )}
             </>
           )}

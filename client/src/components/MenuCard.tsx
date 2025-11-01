@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Edit, Trash2, ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useLocation } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 
 interface MenuCardProps {
   dish: {
@@ -26,13 +26,16 @@ interface MenuCardProps {
 export default function MenuCard({ dish, isOwner, onEdit, onDelete }: MenuCardProps) {
   const { addToCart } = useCart();
   const { userData } = useAuth();
-  const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const isCustomer = userData?.role === "customer";
 
   const handleAddToCart = () => {
     if (!userData) {
-      localStorage.setItem("selectedRole", "customer");
-      setLocation("/login");
+      toast({
+        title: "Please log in",
+        description: "You need to log in as a customer to add items to your cart.",
+        variant: "destructive",
+      });
       return;
     }
     
@@ -71,9 +74,15 @@ export default function MenuCard({ dish, isOwner, onEdit, onDelete }: MenuCardPr
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        <div className="absolute bottom-0 left-0 right-0 p-4 backdrop-blur-md bg-black/30 border-t border-white/10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-full group-hover:translate-y-0">
+          <p className="text-white text-sm line-clamp-3 leading-relaxed">
+            {dish.description}
+          </p>
+        </div>
       </div>
       <CardContent className="p-6 flex flex-col">
-        <div className="flex items-start justify-between gap-3 mb-2">
+        <div className="flex items-start justify-between gap-3 mb-4">
           <h3 className="text-xl font-serif font-bold text-foreground" data-testid={`text-dish-name-${dish.id}`}>
             {dish.name}
           </h3>
@@ -84,9 +93,6 @@ export default function MenuCard({ dish, isOwner, onEdit, onDelete }: MenuCardPr
             ${dish.price.toFixed(2)}
           </span>
         </div>
-        <p className="text-muted-foreground text-sm mb-4 line-clamp-2 leading-relaxed h-10">
-          {dish.description}
-        </p>
         <div className="flex flex-wrap gap-2 mt-auto">
           {dish.cuisineType && (
             <span className="px-3 py-1 rounded-full text-xs font-medium shadow-sm bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20">
