@@ -1,71 +1,61 @@
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import MenuCard from "@/components/MenuCard";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import heroImage from "@assets/generated_images/Restaurant_hero_background_image_62e3db83.png";
-import pastaImage from "@assets/generated_images/Gourmet_pasta_dish_photo_bdc1e780.png";
-import salmonImage from "@assets/generated_images/Grilled_salmon_dish_photo_e47f8711.png";
-import pizzaImage from "@assets/generated_images/Artisan_pizza_photo_79500d48.png";
-import burgerImage from "@assets/generated_images/Gourmet_burger_photo_b4cbe826.png";
-import dessertImage from "@assets/generated_images/Chocolate_dessert_photo_be94ea81.png";
-import saladImage from "@assets/generated_images/Fresh_salad_photo_0fb29148.png";
+
+interface Dish {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  tags: string[];
+  available: boolean;
+}
 
 export default function Home() {
-  const menuItems = [
-    {
-      id: "1",
-      name: "Truffle Mushroom Pasta",
-      description: "Hand-made pasta with wild mushrooms, truffle oil, and parmesan",
-      price: 28.99,
-      imageUrl: pastaImage,
-      tags: ["Italian", "Vegetarian"],
-      available: true,
-    },
-    {
-      id: "2",
-      name: "Grilled Atlantic Salmon",
-      description: "Fresh Atlantic salmon with roasted vegetables and lemon butter sauce",
-      price: 34.99,
-      imageUrl: salmonImage,
-      tags: ["Seafood", "Gluten-Free"],
-      available: true,
-    },
-    {
-      id: "3",
-      name: "Artisan Wood-Fired Pizza",
-      description: "Classic Margherita with fresh mozzarella, basil, and San Marzano tomatoes",
-      price: 22.99,
-      imageUrl: pizzaImage,
-      tags: ["Italian", "Vegetarian"],
-      available: true,
-    },
-    {
-      id: "4",
-      name: "Gourmet Wagyu Burger",
-      description: "Premium wagyu beef with aged cheddar, caramelized onions, and truffle aioli",
-      price: 26.99,
-      imageUrl: burgerImage,
-      tags: ["American"],
-      available: true,
-    },
-    {
-      id: "5",
-      name: "Molten Chocolate Lava Cake",
-      description: "Decadent chocolate cake with a molten center, vanilla ice cream, and berry compote",
-      price: 12.99,
-      imageUrl: dessertImage,
-      tags: ["Dessert", "Vegetarian"],
-      available: true,
-    },
-    {
-      id: "6",
-      name: "Mediterranean Garden Salad",
-      description: "Fresh mixed greens with feta, olives, cherry tomatoes, and balsamic vinaigrette",
-      price: 14.99,
-      imageUrl: saladImage,
-      tags: ["Healthy", "Vegan", "Gluten-Free"],
-      available: true,
-    },
-  ];
+  const [menuItems, setMenuItems] = useState<Dish[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    
+    const loadMenuItems = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "menu"));
+        const dishes: Dish[] = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.available) {
+            dishes.push({ id: doc.id, ...data } as Dish);
+          }
+        });
+        if (isMounted) {
+          setMenuItems(dishes);
+          setError(null);
+        }
+      } catch (error) {
+        console.error("Error loading menu items:", error);
+        if (isMounted) {
+          setError("Failed to load menu items. Please try again later.");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadMenuItems();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -118,11 +108,33 @@ export default function Home() {
               Savor our carefully curated selection of gourmet dishes
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {menuItems.map((dish) => (
-              <MenuCard key={dish.id} dish={dish} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="text-lg text-muted-foreground">Loading menu...</div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <p className="text-destructive mb-6">{error}</p>
+              <Button onClick={() => window.location.reload()}>Retry</Button>
+            </div>
+          ) : menuItems.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground mb-6">
+                No menu items available yet. Check back soon!
+              </p>
+              <Link href="/signup">
+                <a>
+                  <Button>Join as a Restaurant Owner</Button>
+                </a>
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {menuItems.map((dish) => (
+                <MenuCard key={dish.id} dish={dish} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

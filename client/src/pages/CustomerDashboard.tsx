@@ -28,48 +28,70 @@ export default function CustomerDashboard() {
   });
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
+    const loadPreferences = async () => {
+      if (!userData) return;
+
+      try {
+        const prefsDoc = await getDoc(doc(db, "users", userData.uid, "preferences", "dietary"));
+        if (prefsDoc.exists() && isMounted) {
+          setPreferences(prefsDoc.data() as any);
+        }
+      } catch (error) {
+        console.error("Error loading preferences:", error);
+        if (isMounted) {
+          toast({
+            title: "Error",
+            description: "Failed to load your preferences.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    const loadDishes = async () => {
+      setLoading(true);
+      try {
+        const querySnapshot = await getDocs(collection(db, "menu"));
+        const dishesData: Dish[] = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.available) {
+            dishesData.push({ id: doc.id, ...data } as Dish);
+          }
+        });
+        if (isMounted) {
+          setDishes(dishesData);
+          setError(null);
+        }
+      } catch (error) {
+        console.error("Error loading dishes:", error);
+        if (isMounted) {
+          setError("Failed to load menu items. Please try again.");
+          toast({
+            title: "Error",
+            description: "Failed to load menu items.",
+            variant: "destructive",
+          });
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
     loadPreferences();
     loadDishes();
-  }, [userData]);
 
-  const loadPreferences = async () => {
-    if (!userData) return;
-
-    try {
-      const prefsDoc = await getDoc(doc(db, "users", userData.uid, "preferences", "dietary"));
-      if (prefsDoc.exists()) {
-        setPreferences(prefsDoc.data() as any);
-      }
-    } catch (error) {
-      console.error("Error loading preferences:", error);
-    }
-  };
-
-  const loadDishes = async () => {
-    setLoading(true);
-    try {
-      const querySnapshot = await getDocs(collection(db, "menu"));
-      const dishesData: Dish[] = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.available) {
-          dishesData.push({ id: doc.id, ...data } as Dish);
-        }
-      });
-      setDishes(dishesData);
-    } catch (error) {
-      console.error("Error loading dishes:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load menu items.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    return () => {
+      isMounted = false;
+    };
+  }, [userData, toast]);
 
   const handleSavePreferences = async (newPreferences: any) => {
     if (!userData) return;
@@ -121,7 +143,12 @@ export default function CustomerDashboard() {
                 Discover our curated selection of gourmet dishes
               </p>
             </div>
-            {dishes.length === 0 ? (
+            {error ? (
+              <div className="text-center py-12">
+                <p className="text-destructive mb-4">{error}</p>
+                <Button onClick={() => window.location.reload()}>Retry</Button>
+              </div>
+            ) : dishes.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-muted-foreground">No dishes available at the moment. Check back soon!</p>
               </div>

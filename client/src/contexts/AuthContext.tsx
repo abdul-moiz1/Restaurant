@@ -22,7 +22,7 @@ interface AuthContextType {
   loading: boolean;
   signup: (email: string, password: string, role: "owner" | "customer") => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
-  loginWithGoogle: (role?: "owner" | "customer") => Promise<void>;
+  loginWithGoogle: (role?: "owner" | "customer") => Promise<UserData | null>;
   logout: () => Promise<void>;
 }
 
@@ -83,7 +83,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUserData(userData);
   }
 
-  async function loginWithGoogle(role?: "owner" | "customer") {
+  async function loginWithGoogle(role?: "owner" | "customer"): Promise<UserData | null> {
     const userCredential = await signInWithPopup(auth, provider);
     let userData = await getUserData(userCredential.user.uid);
     
@@ -96,6 +96,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
     
     setUserData(userData);
+    return userData;
   }
 
   async function logout() {

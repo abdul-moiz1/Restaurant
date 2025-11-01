@@ -99,18 +99,23 @@ export default function OwnerDashboard() {
 
     try {
       if (editingDish) {
-        await updateDoc(doc(db, "menu", editingDish.id), dishData);
-        setDishes(dishes.map((d) => (d.id === editingDish.id ? { ...dishData, id: editingDish.id, ownerId: userData.uid } : d)));
+        const updateData = {
+          ...dishData,
+          ownerId: editingDish.ownerId,
+        };
+        await updateDoc(doc(db, "menu", editingDish.id), updateData);
+        setDishes(dishes.map((d) => (d.id === editingDish.id ? { ...updateData, id: editingDish.id } : d)));
         toast({
           title: "Dish Updated",
           description: "Your menu item has been updated successfully.",
         });
       } else {
-        const docRef = await addDoc(collection(db, "menu"), {
+        const newDishData = {
           ...dishData,
           ownerId: userData.uid,
-        });
-        setDishes([...dishes, { ...dishData, id: docRef.id, ownerId: userData.uid }]);
+        };
+        const docRef = await addDoc(collection(db, "menu"), newDishData);
+        setDishes([...dishes, { ...newDishData, id: docRef.id }]);
         toast({
           title: "Dish Added",
           description: "New dish has been added to your menu.",

@@ -36,17 +36,22 @@ export default function Signup() {
     setLoading(true);
     try {
       if (isGoogleSignup) {
-        await loginWithGoogle(role);
+        const resultUserData = await loginWithGoogle(role);
+        if (resultUserData) {
+          toast({
+            title: "Account created!",
+            description: "Welcome to Gourmet Haven.",
+          });
+          setLocation(resultUserData.role === "owner" ? "/owner" : "/customer");
+        }
       } else if (pendingCredentials) {
         await signup(pendingCredentials.email, pendingCredentials.password, role);
+        toast({
+          title: "Account created!",
+          description: "Welcome to Gourmet Haven.",
+        });
+        setLocation(role === "owner" ? "/owner" : "/customer");
       }
-      
-      toast({
-        title: "Account created!",
-        description: "Welcome to Gourmet Haven.",
-      });
-      
-      setLocation(role === "owner" ? "/owner" : "/customer");
     } catch (error: any) {
       toast({
         title: "Signup failed",

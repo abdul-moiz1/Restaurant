@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { SiGoogle } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import RoleSelector from "@/components/RoleSelector";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -16,6 +17,13 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showRoleSelector, setShowRoleSelector] = useState(false);
+
+  useEffect(() => {
+    if (userData) {
+      setLocation(userData.role === "owner" ? "/owner" : "/customer");
+    }
+  }, [userData, setLocation]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,21 +48,56 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      await loginWithGoogle();
-      toast({
-        title: "Welcome back!",
-        description: "You've successfully logged in with Google.",
-      });
+      const resultUserData = await loginWithGoogle();
+      if (!resultUserData) {
+        setShowRoleSelector(true);
+        setLoading(false);
+      } else {
+        toast({
+          title: "Welcome back!",
+          description: "You've successfully logged in with Google.",
+        });
+      }
     } catch (error: any) {
       toast({
         title: "Login failed",
         description: error.message || "An error occurred during Google sign-in.",
         variant: "destructive",
       });
-    } finally {
       setLoading(false);
     }
   };
+
+  const handleRoleSelect = async (role: "owner" | "customer") => {
+    setLoading(true);
+    try {
+      const resultUserData = await loginWithGoogle(role);
+      if (resultUserData) {
+        toast({
+          title: "Welcome!",
+          description: "Your account has been created successfully.",
+        });
+        setLocation(resultUserData.role === "owner" ? "/owner" : "/customer");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Setup failed",
+        description: error.message || "Failed to complete account setup.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+      setShowRoleSelector(false);
+    }
+  };
+
+  if (showRoleSelector) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 py-12">
+        <RoleSelector onSelect={handleRoleSelect} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
