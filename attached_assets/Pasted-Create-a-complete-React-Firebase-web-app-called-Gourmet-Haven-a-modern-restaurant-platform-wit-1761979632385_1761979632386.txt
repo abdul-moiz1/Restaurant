@@ -1,0 +1,89 @@
+Create a complete React + Firebase web app called “Gourmet Haven” — a modern restaurant platform with two user types: Owners and Customers.
+
+The app must include:
+────────────────────────────
+1️⃣ Tech stack:
+- React (frontend)
+- Firebase (Auth + Firestore)
+- TailwindCSS (for styling)
+- React Router v6
+
+2️⃣ Firebase setup:
+- Create src/firebase.js that initializes Firebase using:
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+- Export initialized instances:
+  export const app, auth, provider, db
+- Import firebase/app, firebase/auth, firebase/firestore.
+
+────────────────────────────
+3️⃣ File structure:
+src/
+ ├── firebase.js
+ ├── App.jsx
+ ├── index.js
+ ├── /components
+ │     ├── RoleSelector.jsx          // Modal to choose Customer or Owner during signup
+ │     ├── PreferencesForm.jsx       // Customers’ dietary preferences
+ │     ├── MenuCard.jsx              // Displays each dish
+ │     ├── DishForm.jsx              // Owner’s form to add/edit dishes
+ │     ├── Navbar.jsx                // Top navigation bar (Home/Login/Profile)
+ ├── /pages
+ │     ├── Home.jsx                  // Public menu (no login)
+ │     ├── Login.jsx                 // Firebase email + Google login
+ │     ├── Signup.jsx                // Sign-up with role selection
+ │     ├── CustomerDashboard.jsx     // Customer features
+ │     ├── OwnerDashboard.jsx        // Owner dashboard
+
+────────────────────────────
+4️⃣ App flow:
+- Unauthenticated users → see Home.jsx with public menu.
+- Signup page → choose role (“owner” or “customer”) using RoleSelector.
+- On signup, store user data in Firestore:
+  users/{uid} = { uid, email, role, createdAt }
+- After login:
+  if role == "owner" → redirect /owner
+  if role == "customer" → redirect /customer
+
+────────────────────────────
+5️⃣ Firestore collections:
+- users:
+  { uid, email, role, createdAt }
+- menu:
+  { name, description, price, imageUrl, tags, available, ownerId }
+- Each owner can add/edit/delete their dishes.
+- Customers can only read menu data.
+- Customers can save preferences under users/{uid}/preferences.
+
+────────────────────────────
+6️⃣ Routing (React Router v6):
+/ → Home (public)
+/login → Login page
+/signup → Signup page
+/customer → Customer Dashboard (protected)
+/owner → Owner Dashboard (protected)
+
+If not authenticated → redirect to /login
+If wrong role → redirect to correct dashboard.
+
+────────────────────────────
+7️⃣ UI requirements:
+- Theme: white background + gold accent (#c9a348)
+- TailwindCSS styling:
+  - Elegant cards, rounded corners, light shadows.
+  - Serif font for titles, clean sans-serif for body.
+- Navbar with logo “🍽️ Gourmet Haven” + links (Home, Login, Dashboard, Logout)
+- Home page shows menu cards (image, name, price, tags)
+- DishForm has inputs: name, description, price, image URL, tags (comma-separated), availability toggle.
+- PreferencesForm includes checkboxes:
+  - Vegan, Halal, Gluten-Free
+  - Spice level (1–5 slider)
+
+────────────────────────────
+8️⃣ Firestore Security (include as comment):
