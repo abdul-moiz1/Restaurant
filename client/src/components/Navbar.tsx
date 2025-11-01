@@ -111,7 +111,7 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
                 </Button>
                 <Button 
                   size="sm" 
-                  className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white"
+                  className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white shadow-[0_0_20px_rgba(212,175,55,0.5)] hover:shadow-[0_0_35px_rgba(212,175,55,0.8)] transition-all duration-300"
                   onClick={handleSignupClick}
                   data-testid="button-signup"
                 >
