@@ -39,19 +39,22 @@ export default function Home() {
     priceRange: [0, 100],
   });
 
+  const [previewItems, setPreviewItems] = useState<Dish[]>([]);
+
   useEffect(() => {
     let isMounted = true;
     
     const loadMenuItems = async () => {
       try {
-        const q = query(collection(db, "menu"), where("available", "==", true), limit(3));
+        const q = query(collection(db, "menu"), where("available", "==", true), limit(6));
         const querySnapshot = await getDocs(q);
         const dishes: Dish[] = [];
         querySnapshot.forEach((doc) => {
           dishes.push({ id: doc.id, ...doc.data() } as Dish);
         });
         if (isMounted) {
-          setMenuItems(dishes);
+          setMenuItems(dishes.slice(0, 3));
+          setPreviewItems(dishes.slice(3, 6));
           setError(null);
         }
       } catch (error) {
@@ -267,13 +270,36 @@ export default function Home() {
                 ))}
               </div>
               {menuItems.length > 0 && (
-                <div className="text-center mt-12">
-                  <Link href="/menu">
-                    <Button size="lg" variant="outline" data-testid="button-view-full-menu">
-                      View Full Menu
-                    </Button>
-                  </Link>
-                </div>
+                <>
+                  <div className="text-center mt-12 mb-8">
+                    <Link href="/menu">
+                      <Button size="lg" variant="outline" data-testid="button-view-full-menu">
+                        View Full Menu
+                      </Button>
+                    </Link>
+                  </div>
+                  
+                  {previewItems.length > 0 && (
+                    <div className="relative mt-8 overflow-hidden rounded-2xl">
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background pointer-events-none z-10" />
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 opacity-60 blur-[2px] scale-95">
+                        {previewItems.map((dish) => (
+                          <MenuCard key={dish.id} dish={dish} />
+                        ))}
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center z-20">
+                        <Link href="/menu">
+                          <Button 
+                            size="lg" 
+                            className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white shadow-2xl backdrop-blur-sm"
+                          >
+                            Explore More Dishes
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </>
           )}
