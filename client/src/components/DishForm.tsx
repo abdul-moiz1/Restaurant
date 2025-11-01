@@ -5,6 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { storage } from "@/lib/firebase";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { Upload, Link as LinkIcon, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface DishFormProps {
   dish?: {
@@ -22,6 +27,7 @@ interface DishFormProps {
 }
 
 export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormProps) {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -30,6 +36,9 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
     tags: "",
     available: true,
   });
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -41,6 +50,8 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
         tags: dish?.tags?.join(", ") || "",
         available: dish?.available ?? true,
       });
+      setSelectedFile(null);
+      setUploadProgress(0);
     } else {
       setFormData({
         name: "",
@@ -50,24 +61,122 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
         tags: "",
         available: true,
       });
+      setSelectedFile(null);
+      setUploadProgress(0);
     }
   }, [isOpen, dish?.id, dish?.name, dish?.description, dish?.price, dish?.imageUrl, dish?.tags, dish?.available]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file (JPG, PNG, etc.)",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please select an image smaller than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, imageUrl: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async (): Promise<string> => {
+    if (!selectedFile) {
+      return formData.imageUrl;
+    }
+
+    setUploading(true);
+    setUploadProgress(0);
+
+    try {
+      const timestamp = Date.now();
+      const fileName = `dishes/${timestamp}_${selectedFile.name}`;
+      const storageRef = ref(storage, fileName);
+      const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+
+      return new Promise((resolve, reject) => {
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setUploadProgress(progress);
+          },
+          (error) => {
+            console.error("Upload error:", error);
+            setUploading(false);
+            toast({
+              title: "Upload failed",
+              description: "Failed to upload image. Please try again.",
+              variant: "destructive",
+            });
+            reject(error);
+          },
+          async () => {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            setUploading(false);
+            resolve(downloadURL);
+          }
+        );
+      });
+    } catch (error) {
+      setUploading(false);
+      throw error;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      ...formData,
-      tags: formData.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
-      price: Number(formData.price),
-    });
-    setFormData({
-      name: "",
-      description: "",
-      price: 0,
-      imageUrl: "",
-      tags: "",
-      available: true,
-    });
+    
+    try {
+      let finalImageUrl = formData.imageUrl;
+      
+      if (selectedFile) {
+        finalImageUrl = await uploadImage();
+      }
+
+      if (!finalImageUrl) {
+        toast({
+          title: "Image required",
+          description: "Please upload an image or provide an image URL",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      onSubmit({
+        ...formData,
+        imageUrl: finalImageUrl,
+        tags: formData.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+        price: Number(formData.price),
+      });
+      
+      setFormData({
+        name: "",
+        description: "",
+        price: 0,
+        imageUrl: "",
+        tags: "",
+        available: true,
+      });
+      setSelectedFile(null);
+      setUploadProgress(0);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   return (
@@ -132,29 +241,103 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="imageUrl">Image URL *</Label>
-            <Input
-              id="imageUrl"
-              type="url"
-              data-testid="input-dish-image"
-              value={formData.imageUrl}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              placeholder="https://example.com/image.jpg"
-              required
-            />
-            {formData.imageUrl && (
-              <div className="mt-3 rounded-lg overflow-hidden border-2 border-primary/20">
-                <img
-                  src={formData.imageUrl}
-                  alt="Preview"
-                  className="w-full h-48 object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400';
+            <Label>Dish Image *</Label>
+            <Tabs defaultValue="upload" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="upload" className="flex items-center gap-2">
+                  <Upload className="w-4 h-4" />
+                  Upload Image
+                </TabsTrigger>
+                <TabsTrigger value="url" className="flex items-center gap-2">
+                  <LinkIcon className="w-4 h-4" />
+                  Use URL
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="upload" className="space-y-3">
+                <div className="flex items-center justify-center w-full">
+                  <label
+                    htmlFor="file-upload"
+                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/30 hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      {uploading ? (
+                        <>
+                          <Loader2 className="w-10 h-10 mb-3 text-primary animate-spin" />
+                          <p className="text-sm text-muted-foreground">
+                            Uploading... {Math.round(uploadProgress)}%
+                          </p>
+                        </>
+                      ) : selectedFile ? (
+                        <>
+                          <Upload className="w-10 h-10 mb-3 text-primary" />
+                          <p className="mb-2 text-sm text-foreground">
+                            <span className="font-semibold">{selectedFile.name}</span>
+                          </p>
+                          <p className="text-xs text-muted-foreground">Click to change</p>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-10 h-10 mb-3 text-muted-foreground" />
+                          <p className="mb-2 text-sm text-muted-foreground">
+                            <span className="font-semibold">Click to upload</span> or drag and drop
+                          </p>
+                          <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 5MB</p>
+                        </>
+                      )}
+                    </div>
+                    <input
+                      id="file-upload"
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      disabled={uploading}
+                    />
+                  </label>
+                </div>
+                {formData.imageUrl && (
+                  <div className="mt-3 rounded-lg overflow-hidden border-2 border-primary/20">
+                    <img
+                      src={formData.imageUrl}
+                      alt="Preview"
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400';
+                      }}
+                    />
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="url" className="space-y-3">
+                <Input
+                  id="imageUrl"
+                  type="url"
+                  data-testid="input-dish-image"
+                  value={selectedFile ? "" : formData.imageUrl}
+                  onChange={(e) => {
+                    setSelectedFile(null);
+                    setFormData({ ...formData, imageUrl: e.target.value });
                   }}
+                  placeholder="https://example.com/image.jpg"
                 />
-              </div>
-            )}
+                {formData.imageUrl && !selectedFile && (
+                  <div className="mt-3 rounded-lg overflow-hidden border-2 border-primary/20">
+                    <img
+                      src={formData.imageUrl}
+                      alt="Preview"
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400';
+                      }}
+                    />
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
           </div>
 
           <div className="space-y-2">
@@ -184,10 +367,28 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button type="submit" className="flex-1" data-testid="button-submit-dish">
-              {dish?.id ? "Update Dish" : "Add Dish"}
+            <Button 
+              type="submit" 
+              className="flex-1" 
+              data-testid="button-submit-dish"
+              disabled={uploading}
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                dish?.id ? "Update Dish" : "Add Dish"
+              )}
             </Button>
-            <Button type="button" variant="outline" onClick={onCancel} data-testid="button-cancel">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onCancel} 
+              data-testid="button-cancel"
+              disabled={uploading}
+            >
               Cancel
             </Button>
           </div>
