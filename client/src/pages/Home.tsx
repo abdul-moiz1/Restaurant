@@ -270,18 +270,23 @@ export default function Home() {
                 ))}
               </div>
               {menuItems.length > 0 && previewItems.length > 0 && (
-                <div className="relative mt-12 overflow-hidden rounded-2xl">
+                <div className="relative mt-12 overflow-hidden rounded-2xl group/preview">
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background pointer-events-none z-10" />
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 opacity-60 blur-[2px] scale-95">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {previewItems.map((dish) => (
-                      <MenuCard key={dish.id} dish={dish} />
+                      <div 
+                        key={dish.id} 
+                        className="opacity-60 blur-[2px] scale-95 hover:opacity-80 hover:blur-[1px] hover:scale-100 transition-all duration-500"
+                      >
+                        <MenuCard dish={dish} />
+                      </div>
                     ))}
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center z-20">
                     <Link href="/menu">
                       <Button 
                         size="lg" 
-                        className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white shadow-2xl backdrop-blur-sm"
+                        className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white shadow-2xl backdrop-blur-sm hover:scale-110 transition-transform duration-300"
                         data-testid="button-view-full-menu"
                       >
                         Explore More Dishes
