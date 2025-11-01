@@ -6,9 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { SiGoogle } from "react-icons/si";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Login() {
   const [, setLocation] = useLocation();
+  const { login, loginWithGoogle, userData } = useAuth();
+  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,18 +20,40 @@ export default function Login() {
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log("Email login:", { email, password });
-    setTimeout(() => {
+    try {
+      await login(email, password);
+      toast({
+        title: "Welcome back!",
+        description: "You've successfully logged in.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message || "Invalid email or password.",
+        variant: "destructive",
+      });
+    } finally {
       setLoading(false);
-      setLocation("/customer");
-    }, 1000);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    console.log("Google login clicked");
-    setTimeout(() => {
-      setLocation("/customer");
-    }, 1000);
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    try {
+      await loginWithGoogle();
+      toast({
+        title: "Welcome back!",
+        description: "You've successfully logged in with Google.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message || "An error occurred during Google sign-in.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

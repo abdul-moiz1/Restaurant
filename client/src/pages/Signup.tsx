@@ -6,36 +6,59 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { SiGoogle } from "react-icons/si";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import RoleSelector from "@/components/RoleSelector";
 
 export default function Signup() {
   const [, setLocation] = useLocation();
+  const { signup, loginWithGoogle } = useAuth();
+  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showRoleSelector, setShowRoleSelector] = useState(false);
+  const [pendingCredentials, setPendingCredentials] = useState<{ email: string; password: string } | null>(null);
+  const [isGoogleSignup, setIsGoogleSignup] = useState(false);
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    console.log("Email signup:", { email, password });
-    setTimeout(() => {
-      setLoading(false);
-      setShowRoleSelector(true);
-    }, 1000);
+    setPendingCredentials({ email, password });
+    setShowRoleSelector(true);
   };
 
   const handleGoogleSignup = () => {
-    console.log("Google signup clicked");
-    setTimeout(() => {
-      setShowRoleSelector(true);
-    }, 1000);
+    setIsGoogleSignup(true);
+    setShowRoleSelector(true);
   };
 
-  const handleRoleSelect = (role: "owner" | "customer") => {
-    console.log("Role selected:", role);
-    setShowRoleSelector(false);
-    setLocation(role === "owner" ? "/owner" : "/customer");
+  const handleRoleSelect = async (role: "owner" | "customer") => {
+    setLoading(true);
+    try {
+      if (isGoogleSignup) {
+        await loginWithGoogle(role);
+      } else if (pendingCredentials) {
+        await signup(pendingCredentials.email, pendingCredentials.password, role);
+      }
+      
+      toast({
+        title: "Account created!",
+        description: "Welcome to Gourmet Haven.",
+      });
+      
+      setLocation(role === "owner" ? "/owner" : "/customer");
+    } catch (error: any) {
+      toast({
+        title: "Signup failed",
+        description: error.message || "An error occurred during signup.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+      setShowRoleSelector(false);
+      setPendingCredentials(null);
+      setIsGoogleSignup(false);
+    }
   };
 
   return (
