@@ -32,9 +32,9 @@ export default function MenuCard({ dish, isOwner, onEdit, onDelete }: MenuCardPr
   const handleAddToCart = () => {
     if (!userData) {
       toast({
-        title: "Please log in",
-        description: "You need to log in as a customer to add items to your cart.",
-        variant: "destructive",
+        title: "✨ Premium Access Required",
+        description: "Please sign in to add exquisite dishes to your collection.",
+        className: "border-[#D4AF37] bg-gradient-to-br from-[#FAF7F2] to-white dark:from-card dark:to-card border-2 shadow-2xl shadow-[#D4AF37]/20",
       });
       return;
     }
