@@ -295,24 +295,69 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-32 px-4 bg-card dark:bg-background">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex justify-center items-center gap-8 lg:gap-12">
-            <span className="text-6xl lg:text-7xl animate-shimmer-icon" style={{ animationDelay: '0s', color: '#D4AF37' }}>
-              🍽️
-            </span>
-            <span className="text-6xl lg:text-7xl animate-shimmer-icon" style={{ animationDelay: '0.2s', color: '#D4AF37' }}>
-              🥂
-            </span>
-            <span className="text-6xl lg:text-7xl animate-shimmer-icon" style={{ animationDelay: '0.4s', color: '#D4AF37' }}>
-              🍷
-            </span>
-            <span className="text-6xl lg:text-7xl animate-shimmer-icon" style={{ animationDelay: '0.6s', color: '#D4AF37' }}>
-              🍰
-            </span>
-            <span className="text-6xl lg:text-7xl animate-shimmer-icon" style={{ animationDelay: '0.8s', color: '#D4AF37' }}>
-              🍴
-            </span>
+      <section className="py-24 px-4 bg-gradient-to-br from-[#FAF7F2] via-white to-[#FAF7F2] dark:from-background dark:via-background dark:to-background relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-[#D4AF37]"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
+        </div>
+        
+        <div className="max-w-6xl mx-auto relative">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-serif font-bold text-foreground mb-2">The Gourmet Experience</h2>
+            <p className="text-muted-foreground">From plate to palate, every moment is crafted with care</p>
+          </div>
+          
+          <div className="relative flex justify-center items-center">
+            <svg className="absolute w-full h-24" viewBox="0 0 1000 100" preserveAspectRatio="none">
+              <path
+                d="M 0,50 Q 125,30 250,50 T 500,50 T 750,50 T 1000,50"
+                fill="none"
+                stroke="url(#gradient)"
+                strokeWidth="2"
+                className="opacity-30"
+              />
+              <defs>
+                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{ stopColor: '#D4AF37', stopOpacity: 0.3 }} />
+                  <stop offset="50%" style={{ stopColor: '#D4AF37', stopOpacity: 1 }} />
+                  <stop offset="100%" style={{ stopColor: '#D4AF37', stopOpacity: 0.3 }} />
+                </linearGradient>
+              </defs>
+            </svg>
+            
+            <div className="flex justify-between items-center w-full max-w-4xl relative z-10">
+              {[
+                { emoji: '🍽️', label: 'Plating', delay: '0s' },
+                { emoji: '🥂', label: 'Celebrations', delay: '0.15s' },
+                { emoji: '🍷', label: 'Fine Wine', delay: '0.3s' },
+                { emoji: '🍰', label: 'Desserts', delay: '0.45s' },
+                { emoji: '🍴', label: 'Dining', delay: '0.6s' }
+              ].map((item, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col items-center group cursor-default"
+                  style={{ animationDelay: item.delay }}
+                >
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500 scale-0 group-hover:scale-150"></div>
+                    <div className="relative bg-white dark:bg-card rounded-full p-4 lg:p-6 shadow-lg border-2 border-[#D4AF37]/20 group-hover:border-[#D4AF37]/50 transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-2">
+                      <span className="text-4xl lg:text-5xl block transition-transform duration-300 group-hover:scale-110">
+                        {item.emoji}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="mt-3 text-xs lg:text-sm font-medium text-muted-foreground group-hover:text-[#D4AF37] transition-colors duration-300 opacity-0 group-hover:opacity-100">
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
