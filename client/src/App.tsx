@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as HotToaster } from "react-hot-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { CartProvider } from "@/contexts/CartContext";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
@@ -12,6 +13,7 @@ import Signup from "@/pages/Signup";
 import Menu from "@/pages/Menu";
 import Preferences from "@/pages/Preferences";
 import Checkout from "@/pages/Checkout";
+import Cart from "@/pages/Cart";
 import OwnerDashboard from "@/pages/OwnerDashboard";
 import NotFound from "@/pages/not-found";
 
@@ -60,6 +62,7 @@ function Router() {
         <Route path="/signup" component={Signup} />
         <Route path="/menu" component={Menu} />
         <Route path="/preferences" component={Preferences} />
+        <Route path="/cart" component={Cart} />
         <Route path="/checkout">
           {() => <ProtectedRoute component={Checkout} requiredRole="customer" />}
         </Route>
@@ -76,11 +79,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <HotToaster position="top-right" />
-          <Router />
-        </TooltipProvider>
+        <CartProvider>
+          <TooltipProvider>
+            <Toaster />
+            <HotToaster position="top-right" />
+            <Router />
+          </TooltipProvider>
+        </CartProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

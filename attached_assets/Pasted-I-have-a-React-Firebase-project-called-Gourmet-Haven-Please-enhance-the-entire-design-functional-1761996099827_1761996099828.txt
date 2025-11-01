@@ -1,0 +1,207 @@
+I have a React + Firebase project called Gourmet Haven.
+Please enhance the entire design, functionality, and Firebase integration with the following requirements:
+
+🎨 1. Home Page Enhancements
+
+Keep a luxurious, fine-dining background (blurred restaurant lights).
+
+Add a premium animated logo (e.g., golden plate/fork icon that subtly glows or rotates).
+
+Animate the headline text (“Elevate Your Dining Experience”) with a fade-up animation.
+
+Replace the “Sign Up” and “Login” navbar buttons with a single “Login” button visible only when not logged in.
+
+Add Preferences below the hero (remove it from the navbar):
+
+Cuisine filters (Italian, Indian, Continental, etc.)
+
+Dietary filters (Vegan, Keto, Gluten-Free)
+
+Price range slider
+
+“Apply Filters” button that updates the menu dynamically.
+
+On hover, hero image slightly zooms or uses parallax motion.
+
+🍽️ 2. Menu Page & Item Management
+
+Populate with real-looking sample dishes (e.g., Steak, Pasta, Salad, Dessert, Sushi, Soup).
+
+Each dish card must show:
+
+Image
+
+Dish name
+
+Price
+
+Availability (Available / Out of Stock)
+
+“Add to Cart” button (for customers)
+
+Add hover animation: slight scale-up with a shadow glow.
+
+Add dynamic filtering via Preferences from Home.
+
+When no dish matches, show a graceful message:
+“No dishes match your preferences — try a different flavor!”
+
+👨‍🍳 3. Owner Dashboard (Add / Edit / Delete Dishes)
+
+Add an Owner Dashboard page accessible only to users with role = "owner".
+
+Include:
+
++ Add Dish button → opens modal with:
+
+Dish Name
+
+Price
+
+Description
+
+Availability toggle
+
+Image upload (to Firebase Storage)
+
+Owner can:
+
+Add new dishes (saved in Firestore under /menu collection).
+
+Edit or Delete existing dishes.
+
+Publish or unpublish dishes.
+
+Dashboard shows:
+
+Total Dishes
+
+Available / Unavailable counts
+
+Preview of dishes in a responsive grid.
+
+🧍 4. Customer Experience
+
+Customers can:
+
+Browse menu and filter preferences without logging in.
+
+Log in only when they click “Checkout”.
+
+Add dishes to cart (stored temporarily in local state or Firestore).
+
+After login, continue checkout seamlessly.
+
+On login, “Sign Up” and “Login” buttons disappear and show “Cart” + “Logout”.
+
+🔐 5. Login Flow & Role Selection
+
+When clicking “Login,” show a modal:
+
+“Are you a Customer or Owner?”
+
+Two styled buttons → redirect to respective Firebase auth flow.
+
+Firebase Auth:
+
+Email/Password login and signup.
+
+Google Sign-In support.
+
+Store user roles in Firestore (users/{uid}.role = "customer" | "owner").
+
+Owners see Dashboard after login; customers go to the menu.
+
+🧾 6. Footer Design
+
+Add elegant footer background (cream or gold tone).
+
+Include animated plates, forks, and glasses moving softly with CSS.
+
+Add:
+
+📍 Address
+
+📞 Phone
+
+📧 Email
+
+Links: About • Contact • Privacy Policy
+
+Small text animation (like shimmer on hover).
+
+💅 7. Style & UX
+
+Use TailwindCSS for styling.
+
+Palette:
+
+Gold #D4AF37
+
+Ivory #FAF7F2
+
+Dark Text #2E2E2E
+
+Smooth transitions with Framer Motion (for page load, modals, buttons).
+
+Fully responsive (desktop, tablet, mobile).
+
+⚙️ 8. Firebase Integration
+
+Use:
+
+Firebase Auth (email + Google)
+
+Firestore for menu, users, and roles
+
+Firebase Storage for dish images
+
+Firestore structure:
+
+users/
+  uid/
+    name:
+    email:
+    role: "customer" or "owner"
+
+menu/
+  dishId/
+    name:
+    price:
+    description:
+    imageUrl:
+    available: true/false
+    createdBy: uid
+
+
+Secure with Firebase Rules (only owners can write to /menu).
+
+📁 9. App Structure
+src/
+ ├── components/
+ │    ├── Navbar.jsx
+ │    ├── Footer.jsx
+ │    ├── DishCard.jsx
+ │    ├── AddDishModal.jsx
+ │    └── Preferences.jsx
+ ├── pages/
+ │    ├── Home.jsx
+ │    ├── Menu.jsx
+ │    ├── Dashboard.jsx
+ │    └── Login.jsx
+ ├── firebase.js
+ ├── App.jsx
+ ├── routes.js
+ └── styles.css
+
+🚀 Goal
+
+Make Gourmet Haven a visually stunning, modern restaurant web app that:
+
+Has role-based login (owner vs customer)
+
+Lets owners add/manage menu items
+
+Lets customers browse and filter dishes
+
+Feels premium, smooth, and professional.

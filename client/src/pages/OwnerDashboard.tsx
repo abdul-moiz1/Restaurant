@@ -179,7 +179,7 @@ export default function OwnerDashboard() {
             <p className="text-muted-foreground">Manage your restaurant menu</p>
           </div>
           <div className="flex gap-3">
-            <Button onClick={handleAddDish} data-testid="button-add-dish" className="bg-primary hover:bg-primary/90">
+            <Button onClick={handleAddDish} data-testid="button-add-dish" className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white">
               <Plus className="w-4 h-4 mr-2" />
               Add Dish
             </Button>
@@ -203,7 +203,7 @@ export default function OwnerDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold" style={{ color: '#c9a348' }} data-testid={`stat-${stat.label.toLowerCase().replace(" ", "-")}`}>
+                <div className="text-4xl font-bold text-[#D4AF37]" data-testid={`stat-${stat.label.toLowerCase().replace(" ", "-")}`}>
                   {stat.value}
                 </div>
               </CardContent>
@@ -217,7 +217,7 @@ export default function OwnerDashboard() {
             <Card className="p-16 text-center shadow-md">
               <div className="max-w-md mx-auto">
                 <p className="text-muted-foreground text-lg mb-6">No dishes yet. Start by adding your first menu item!</p>
-                <Button onClick={handleAddDish} size="lg" className="bg-primary hover:bg-primary/90">
+                <Button onClick={handleAddDish} size="lg" className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white">
                   <Plus className="w-5 h-5 mr-2" />
                   Add Your First Dish
                 </Button>
