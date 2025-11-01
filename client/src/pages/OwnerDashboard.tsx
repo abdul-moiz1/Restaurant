@@ -176,7 +176,7 @@ export default function OwnerDashboard() {
         {showForm ? (
           <div className="mb-8">
             <DishForm
-              dish={editingDish}
+              dish={editingDish || undefined}
               onSubmit={handleSubmitDish}
               onCancel={() => {
                 setShowForm(false);
