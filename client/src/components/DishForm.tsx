@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -186,6 +186,9 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
           <DialogTitle className="text-2xl font-serif">
             {dish?.id ? "Edit Dish" : "Add New Dish"}
           </DialogTitle>
+          <DialogDescription>
+            {dish?.id ? "Update the details of your menu item" : "Add a new dish to your restaurant menu"}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6 pt-4">
           <div className="space-y-2">
