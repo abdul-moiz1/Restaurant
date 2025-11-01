@@ -16,14 +16,15 @@ export default function Signup() {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
   const [showRoleSelector, setShowRoleSelector] = useState(false);
-  const [pendingCredentials, setPendingCredentials] = useState<{ email: string; password: string } | null>(null);
+  const [pendingCredentials, setPendingCredentials] = useState<{ email: string; password: string; displayName: string } | null>(null);
   const [isGoogleSignup, setIsGoogleSignup] = useState(false);
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPendingCredentials({ email, password });
+    setPendingCredentials({ email, password, displayName });
     setShowRoleSelector(true);
   };
 
@@ -45,7 +46,7 @@ export default function Signup() {
           setLocation(resultUserData.role === "owner" ? "/owner" : "/customer");
         }
       } else if (pendingCredentials) {
-        await signup(pendingCredentials.email, pendingCredentials.password, role);
+        await signup(pendingCredentials.email, pendingCredentials.password, pendingCredentials.displayName, role);
         toast({
           title: "Account created!",
           description: "Welcome to Gourmet Haven.",
@@ -76,6 +77,19 @@ export default function Signup() {
         <CardContent>
           <form onSubmit={handleEmailSignup} className="space-y-4">
             <div className="space-y-2">
+              <Label htmlFor="displayName">Full Name</Label>
+              <Input
+                id="displayName"
+                type="text"
+                data-testid="input-displayname"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="John Doe"
+                autoComplete="name"
+                required
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -98,6 +112,7 @@ export default function Signup() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete="new-password"
+                minLength={6}
                 required
               />
             </div>

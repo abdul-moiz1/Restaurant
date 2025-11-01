@@ -13,6 +13,7 @@ import { auth, provider, db } from "@/lib/firebase";
 interface UserData {
   uid: string;
   email: string;
+  displayName: string;
   role: "owner" | "customer";
 }
 
@@ -20,7 +21,7 @@ interface AuthContextType {
   currentUser: FirebaseUser | null;
   userData: UserData | null;
   loading: boolean;
-  signup: (email: string, password: string, role: "owner" | "customer") => Promise<void>;
+  signup: (email: string, password: string, displayName: string, role: "owner" | "customer") => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: (role?: "owner" | "customer") => Promise<UserData | null>;
   logout: () => Promise<void>;
@@ -58,10 +59,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
-  async function createUserData(uid: string, email: string, role: "owner" | "customer") {
+  async function createUserData(uid: string, email: string, displayName: string, role: "owner" | "customer") {
     const userData: UserData = {
       uid,
       email,
+      displayName,
       role,
     };
     await setDoc(doc(db, "users", uid), {
@@ -71,9 +73,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return userData;
   }
 
-  async function signup(email: string, password: string, role: "owner" | "customer") {
+  async function signup(email: string, password: string, displayName: string, role: "owner" | "customer") {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const userData = await createUserData(userCredential.user.uid, email, role);
+    const userData = await createUserData(userCredential.user.uid, email, displayName, role);
     setUserData(userData);
   }
 
@@ -91,6 +93,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       userData = await createUserData(
         userCredential.user.uid,
         userCredential.user.email || "",
+        userCredential.user.displayName || "User",
         role
       );
     }
