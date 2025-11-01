@@ -188,7 +188,7 @@ export default function Menu() {
                   <div>
                     <Label className="text-sm font-medium mb-3 block">Dietary Preferences</Label>
                     <div className="space-y-2">
-                      {['Vegan', 'Keto', 'Gluten-Free'].map((dietary) => (
+                      {['Vegetarian', 'Vegan', 'Keto', 'Gluten-Free'].map((dietary) => (
                         <div key={dietary} className="flex items-center gap-2">
                           <Checkbox
                             id={`dietary-${dietary}`}
@@ -205,7 +205,7 @@ export default function Menu() {
                   </div>
 
                   <div>
-                    <Label className="text-sm font-medium mb-3 block">Price Range</Label>
+                    <Label className="text-sm font-medium mb-3 block">Price Range per Dish</Label>
                     <div className="space-y-4">
                       <Slider
                         min={0}
@@ -215,9 +215,16 @@ export default function Menu() {
                         onValueChange={setPriceRange}
                         data-testid="slider-price-range"
                       />
-                      <div className="flex justify-between text-sm text-muted-foreground">
-                        <span data-testid="text-price-min">${priceRange[0]}</span>
-                        <span data-testid="text-price-max">${priceRange[1]}</span>
+                      <div className="flex justify-between items-center">
+                        <div className="flex flex-col">
+                          <span className="text-xs text-muted-foreground">Min</span>
+                          <span className="text-sm font-semibold text-[#D4AF37]" data-testid="text-price-min">${priceRange[0]}</span>
+                        </div>
+                        <span className="text-muted-foreground text-xs">to</span>
+                        <div className="flex flex-col text-right">
+                          <span className="text-xs text-muted-foreground">Max</span>
+                          <span className="text-sm font-semibold text-[#D4AF37]" data-testid="text-price-max">${priceRange[1]}{priceRange[1] === 100 ? '+' : ''}</span>
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -204,7 +204,7 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-serif font-semibold mb-4">Price Range</h3>
+                  <h3 className="text-xl font-serif font-semibold mb-4">Price Range per Dish</h3>
                   <div className="space-y-4">
                     <Slider
                       min={0}
@@ -215,9 +215,16 @@ export default function Home() {
                       className="w-full"
                       data-testid="slider-price-range"
                     />
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>${preferences.priceRange[0]}</span>
-                      <span>${preferences.priceRange[1]}</span>
+                    <div className="flex justify-between items-center">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground">Min Price</span>
+                        <span className="text-base font-semibold text-[#D4AF37]">${preferences.priceRange[0]}</span>
+                      </div>
+                      <span className="text-muted-foreground">—</span>
+                      <div className="flex flex-col text-right">
+                        <span className="text-xs text-muted-foreground">Max Price</span>
+                        <span className="text-base font-semibold text-[#D4AF37]">${preferences.priceRange[1]}{preferences.priceRange[1] === 100 ? '+' : ''}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
