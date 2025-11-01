@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Switch, Route, useLocation, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -7,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import Navbar from "@/components/Navbar";
+import { seedSampleDishes } from "@/lib/seedMenu";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
@@ -35,7 +37,7 @@ function ProtectedRoute({ component: Component, requiredRole }: { component: any
   }
 
   if (requiredRole && userData.role !== requiredRole) {
-    return <Redirect to={userData.role === "owner" ? "/owner" : "/customer"} />;
+    return <Redirect to={userData.role === "owner" ? "/dashboard" : "/menu"} />;
   }
 
   return <Component />;
@@ -53,7 +55,7 @@ function Router() {
   return (
     <>
       <Navbar 
-        user={userData ? { email: userData.email, role: userData.role } : null} 
+        user={userData ? { email: userData.email, displayName: userData.displayName, role: userData.role } : null} 
         onLogout={handleLogout} 
       />
       <Switch>
@@ -66,8 +68,11 @@ function Router() {
         <Route path="/checkout">
           {() => <ProtectedRoute component={Checkout} requiredRole="customer" />}
         </Route>
-        <Route path="/owner">
+        <Route path="/dashboard">
           {() => <ProtectedRoute component={OwnerDashboard} requiredRole="owner" />}
+        </Route>
+        <Route path="/owner">
+          {() => <Redirect to="/dashboard" />}
         </Route>
         <Route component={NotFound} />
       </Switch>
@@ -76,6 +81,10 @@ function Router() {
 }
 
 function App() {
+  useEffect(() => {
+    seedSampleDishes();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

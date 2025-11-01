@@ -12,8 +12,10 @@ interface MenuCardProps {
     description: string;
     price: number;
     imageUrl: string;
-    tags: string[];
+    tags?: string[];
     available: boolean;
+    cuisineType?: string;
+    dietary?: string[];
   };
   isOwner?: boolean;
   onEdit?: (id: string) => void;
@@ -38,7 +40,7 @@ export default function MenuCard({ dish, isOwner, onEdit, onDelete }: MenuCardPr
 
   return (
     <Card 
-      className="overflow-hidden hover:shadow-xl transition-all duration-300 border hover:-translate-y-1 hover:shadow-[#D4AF37]/20 group" 
+      className="overflow-hidden hover:shadow-xl transition-all duration-300 border hover:scale-105 hover:-translate-y-1 hover:shadow-[#D4AF37]/20 group" 
       data-testid={`card-dish-${dish.id}`}
     >
       <div className="relative h-56 overflow-hidden bg-muted">
@@ -78,10 +80,15 @@ export default function MenuCard({ dish, isOwner, onEdit, onDelete }: MenuCardPr
           {dish.description}
         </p>
         <div className="flex flex-wrap gap-2">
-          {dish.tags.map((tag, index) => (
+          {dish.cuisineType && (
+            <span className="px-3 py-1 rounded-full text-xs font-medium shadow-sm bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20">
+              {dish.cuisineType}
+            </span>
+          )}
+          {dish.dietary?.map((tag, index) => (
             <span 
               key={index} 
-              className="px-3 py-1 rounded-full text-xs font-medium shadow-sm bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20"
+              className="px-3 py-1 rounded-full text-xs font-medium shadow-sm bg-blue-500/10 text-blue-600 border border-blue-500/20"
             >
               {tag}
             </span>

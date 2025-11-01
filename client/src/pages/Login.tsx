@@ -21,7 +21,7 @@ export default function Login() {
 
   useEffect(() => {
     if (userData) {
-      setLocation(userData.role === "owner" ? "/owner" : "/customer");
+      setLocation(userData.role === "owner" ? "/dashboard" : "/menu");
     }
   }, [userData, setLocation]);
 
@@ -77,7 +77,7 @@ export default function Login() {
           title: "Welcome!",
           description: "Your account has been created successfully.",
         });
-        setLocation(resultUserData.role === "owner" ? "/owner" : "/customer");
+        setLocation(resultUserData.role === "owner" ? "/dashboard" : "/menu");
       }
     } catch (error: any) {
       toast({

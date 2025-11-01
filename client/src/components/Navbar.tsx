@@ -7,6 +7,7 @@ import { useCart } from "@/contexts/CartContext";
 interface NavbarProps {
   user?: {
     email: string;
+    displayName?: string;
     role: "owner" | "customer";
   } | null;
   onLogout?: () => void;
@@ -23,10 +24,12 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
           <Link 
             href="/"
             data-testid="link-home"
-            className="text-xl font-serif font-bold text-foreground hover:text-[#D4AF37] transition-colors flex items-center gap-2"
+            className="text-xl font-serif font-bold flex items-center gap-2 group"
           >
-            <UtensilsCrossed className="w-6 h-6 text-[#D4AF37]" />
-            Gourmet Haven
+            <UtensilsCrossed className="w-6 h-6 text-[#D4AF37] group-hover:scale-110 transition-transform" />
+            <span className="bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37] bg-[length:200%_100%] bg-clip-text text-transparent animate-shimmer">
+              Gourmet Haven
+            </span>
           </Link>
 
           <div className="flex items-center gap-6">
@@ -47,6 +50,9 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
             
             {user ? (
               <>
+                <span className="text-sm text-muted-foreground" data-testid="text-welcome-user">
+                  Welcome, <span className="text-[#D4AF37] font-medium">{user.displayName || user.email.split('@')[0]}</span>
+                </span>
                 {user.role === "customer" && (
                   <Link 
                     href="/cart"
@@ -70,9 +76,9 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
                 )}
                 {user.role === "owner" && (
                   <Link 
-                    href="/owner"
+                    href="/dashboard"
                     data-testid="link-nav-dashboard"
-                    className={`text-sm font-medium hover:text-[#D4AF37] transition-colors ${location === "/owner" ? "text-[#D4AF37]" : "text-foreground"}`}
+                    className={`text-sm font-medium hover:text-[#D4AF37] transition-colors ${location === "/dashboard" ? "text-[#D4AF37]" : "text-foreground"}`}
                   >
                     Dashboard
                   </Link>
@@ -89,11 +95,18 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
                 </Button>
               </>
             ) : (
-              <Link href="/login" data-testid="link-login">
-                <Button size="sm" className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white">
-                  Login
-                </Button>
-              </Link>
+              <>
+                <Link href="/login" data-testid="link-login">
+                  <Button variant="ghost" size="sm" className="hover:text-[#D4AF37]">
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/signup" data-testid="link-signup">
+                  <Button size="sm" className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
             )}
           </div>
         </div>

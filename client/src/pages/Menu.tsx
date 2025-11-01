@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Card } from "@/components/ui/card";
 import MenuCard from "@/components/MenuCard";
+import Footer from "@/components/Footer";
 import { Search, Filter, Utensils } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -14,11 +19,11 @@ interface Dish {
   description: string;
   price: number;
   imageUrl: string;
-  tags: string[];
+  tags?: string[];
   available: boolean;
-  dietaryType?: string;
-  allergens?: string[];
-  spiceLevel?: number;
+  cuisineType?: string;
+  dietary?: string[];
+  ownerId?: string;
 }
 
 export default function Menu() {
@@ -27,35 +32,28 @@ export default function Menu() {
   const [filteredDishes, setFilteredDishes] = useState<Dish[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [dietaryFilter, setDietaryFilter] = useState<string>("all");
-  const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 1000 });
-  const [showFilters, setShowFilters] = useState(false);
-  const [cuisineFilters, setCuisineFilters] = useState<string[]>([]);
+  const [cuisineType, setCuisineType] = useState<string>("all");
+  const [dietaryFilters, setDietaryFilters] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<number[]>([0, 100]);
+  const [showFilters, setShowFilters] = useState(true);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const cuisines = params.get('cuisines');
     const dietary = params.get('dietary');
     const minPrice = params.get('minPrice');
     const maxPrice = params.get('maxPrice');
 
-    if (cuisines) {
-      setCuisineFilters(cuisines.split(',').filter(c => c));
-      setShowFilters(true);
-    }
     if (dietary) {
       const dietaryOptions = dietary.split(',').filter(d => d);
       if (dietaryOptions.length > 0) {
-        setDietaryFilter(dietaryOptions[0]);
-        setShowFilters(true);
+        setDietaryFilters(dietaryOptions);
       }
     }
     if (minPrice || maxPrice) {
-      setPriceRange({
-        min: minPrice ? parseInt(minPrice) : 0,
-        max: maxPrice ? parseInt(maxPrice) : 1000,
-      });
-      setShowFilters(true);
+      setPriceRange([
+        minPrice ? parseInt(minPrice) : 0,
+        maxPrice ? parseInt(maxPrice) : 100,
+      ]);
     }
 
     loadDishes();
@@ -63,7 +61,7 @@ export default function Menu() {
 
   useEffect(() => {
     filterDishes();
-  }, [searchTerm, dietaryFilter, dishes, priceRange, cuisineFilters]);
+  }, [searchTerm, cuisineType, dietaryFilters, dishes, priceRange]);
 
   const loadDishes = async () => {
     try {
@@ -89,39 +87,43 @@ export default function Menu() {
       filtered = filtered.filter(
         (dish) =>
           dish.name.toLowerCase().includes(term) ||
-          dish.description.toLowerCase().includes(term) ||
-          dish.tags?.some((tag) => tag.toLowerCase().includes(term))
+          dish.description.toLowerCase().includes(term)
       );
     }
 
-    if (dietaryFilter && dietaryFilter !== "all") {
-      filtered = filtered.filter(
-        (dish) => dish.dietaryType === dietaryFilter || dish.dietaryType === "All" || !dish.dietaryType
-      );
+    if (cuisineType && cuisineType !== "all") {
+      filtered = filtered.filter((dish) => dish.cuisineType === cuisineType);
     }
 
-    if (cuisineFilters.length > 0) {
+    if (dietaryFilters.length > 0) {
       filtered = filtered.filter((dish) =>
-        dish.tags?.some((tag) => cuisineFilters.some((cuisine) => tag.toLowerCase().includes(cuisine.toLowerCase())))
+        dish.dietary?.some((d) => dietaryFilters.includes(d))
       );
     }
 
     filtered = filtered.filter(
-      (dish) => dish.price >= priceRange.min && dish.price <= priceRange.max
+      (dish) => dish.price >= priceRange[0] && dish.price <= priceRange[1]
     );
 
     setFilteredDishes(filtered);
   };
 
-  const clearFilters = () => {
-    setSearchTerm("");
-    setDietaryFilter("all");
-    setCuisineFilters([]);
-    setPriceRange({ min: 0, max: 1000 });
-    window.history.pushState({}, '', '/menu');
+  const toggleDietary = (dietary: string) => {
+    setDietaryFilters(prev =>
+      prev.includes(dietary)
+        ? prev.filter(d => d !== dietary)
+        : [...prev, dietary]
+    );
   };
 
-  const hasActiveFilters = searchTerm || dietaryFilter !== "all" || cuisineFilters.length > 0 || priceRange.min > 0 || priceRange.max < 1000;
+  const clearFilters = () => {
+    setSearchTerm("");
+    setCuisineType("all");
+    setDietaryFilters([]);
+    setPriceRange([0, 100]);
+  };
+
+  const hasActiveFilters = searchTerm || cuisineType !== "all" || dietaryFilters.length > 0 || priceRange[0] > 0 || priceRange[1] < 100;
 
   return (
     <div className="min-h-screen">
@@ -134,7 +136,7 @@ export default function Menu() {
             Refined global cuisine, curated for your taste
           </p>
 
-          <div className="max-w-3xl mx-auto space-y-4">
+          <div className="max-w-5xl mx-auto space-y-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
@@ -146,56 +148,82 @@ export default function Menu() {
               />
             </div>
 
-            <div className="flex gap-4 items-center flex-wrap">
-              <Button
-                variant="outline"
-                onClick={() => setShowFilters(!showFilters)}
-                data-testid="button-toggle-filters"
-                className="border-[#D4AF37]/30 hover:bg-[#D4AF37]/10"
-              >
-                <Filter className="mr-2 h-4 w-4" />
-                {showFilters ? "Hide Filters" : "Show Filters"}
-              </Button>
+            <Card className="backdrop-blur-lg bg-white/20 dark:bg-black/20 border-[#D4AF37]/20 p-6">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-serif font-semibold flex items-center gap-2">
+                    <Filter className="w-5 h-5 text-[#D4AF37]" />
+                    Filters
+                  </h3>
+                  {hasActiveFilters && (
+                    <Button
+                      variant="ghost"
+                      onClick={clearFilters}
+                      data-testid="button-clear-filters"
+                      className="text-[#D4AF37] hover:text-[#D4AF37]/90 hover:bg-[#D4AF37]/10"
+                    >
+                      Clear All
+                    </Button>
+                  )}
+                </div>
 
-              {showFilters && (
-                <Select value={dietaryFilter} onValueChange={setDietaryFilter}>
-                  <SelectTrigger className="w-[200px]" data-testid="select-dietary">
-                    <SelectValue placeholder="Dietary Preference" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Dishes</SelectItem>
-                    <SelectItem value="Vegan">Vegan</SelectItem>
-                    <SelectItem value="Vegetarian">Vegetarian</SelectItem>
-                    <SelectItem value="Pescatarian">Pescatarian</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <Label className="text-sm font-medium mb-3 block">Cuisine Type</Label>
+                    <Select value={cuisineType} onValueChange={setCuisineType}>
+                      <SelectTrigger data-testid="select-cuisine">
+                        <SelectValue placeholder="All Cuisines" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Cuisines</SelectItem>
+                        <SelectItem value="Italian">Italian</SelectItem>
+                        <SelectItem value="Asian">Asian</SelectItem>
+                        <SelectItem value="Desserts">Desserts</SelectItem>
+                        <SelectItem value="American">American</SelectItem>
+                        <SelectItem value="Mediterranean">Mediterranean</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              {hasActiveFilters && (
-                <Button
-                  variant="ghost"
-                  onClick={clearFilters}
-                  data-testid="button-clear-filters"
-                  className="text-[#D4AF37] hover:text-[#D4AF37]/90 hover:bg-[#D4AF37]/10"
-                >
-                  Clear All Filters
-                </Button>
-              )}
-            </div>
+                  <div>
+                    <Label className="text-sm font-medium mb-3 block">Dietary Preferences</Label>
+                    <div className="space-y-2">
+                      {['Vegan', 'Keto', 'Gluten-Free'].map((dietary) => (
+                        <div key={dietary} className="flex items-center gap-2">
+                          <Checkbox
+                            id={`dietary-${dietary}`}
+                            checked={dietaryFilters.includes(dietary)}
+                            onCheckedChange={() => toggleDietary(dietary)}
+                            data-testid={`checkbox-dietary-${dietary.toLowerCase()}`}
+                          />
+                          <Label htmlFor={`dietary-${dietary}`} className="cursor-pointer text-sm">
+                            {dietary}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-            {cuisineFilters.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                <span className="text-sm text-muted-foreground">Cuisines:</span>
-                {cuisineFilters.map((cuisine) => (
-                  <span
-                    key={cuisine}
-                    className="px-3 py-1 rounded-full text-xs font-medium bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20"
-                  >
-                    {cuisine}
-                  </span>
-                ))}
+                  <div>
+                    <Label className="text-sm font-medium mb-3 block">Price Range</Label>
+                    <div className="space-y-4">
+                      <Slider
+                        min={0}
+                        max={100}
+                        step={5}
+                        value={priceRange}
+                        onValueChange={setPriceRange}
+                        data-testid="slider-price-range"
+                      />
+                      <div className="flex justify-between text-sm text-muted-foreground">
+                        <span data-testid="text-price-min">${priceRange[0]}</span>
+                        <span data-testid="text-price-max">${priceRange[1]}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
+            </Card>
           </div>
         </div>
       </div>
@@ -251,6 +279,7 @@ export default function Menu() {
           </>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

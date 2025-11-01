@@ -5,7 +5,8 @@ import MenuCard from "@/components/MenuCard";
 import DishForm from "@/components/DishForm";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Plus } from "lucide-react";
+import Footer from "@/components/Footer";
+import { Plus, Utensils, CheckCircle, XCircle } from "lucide-react";
 import {
   collection,
   query,
@@ -24,9 +25,11 @@ interface Dish {
   description: string;
   price: number;
   imageUrl: string;
-  tags: string[];
+  tags?: string[];
   available: boolean;
-  ownerId: string;
+  cuisineType?: string;
+  dietary?: string[];
+  ownerId?: string;
 }
 
 export default function OwnerDashboard() {
@@ -157,9 +160,9 @@ export default function OwnerDashboard() {
   };
 
   const stats = [
-    { label: "Total Dishes", value: dishes.length },
-    { label: "Available", value: dishes.filter((d) => d.available).length },
-    { label: "Unavailable", value: dishes.filter((d) => !d.available).length },
+    { label: "Total Dishes", value: dishes.length, icon: Utensils, color: "text-[#D4AF37]" },
+    { label: "Available", value: dishes.filter((d) => d.available).length, icon: CheckCircle, color: "text-green-600" },
+    { label: "Out of Stock", value: dishes.filter((d) => !d.available).length, icon: XCircle, color: "text-red-600" },
   ];
 
   if (loading) {
@@ -195,20 +198,28 @@ export default function OwnerDashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {stats.map((stat, index) => (
-            <Card key={index} className="shadow-md hover:shadow-lg transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  {stat.label}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-[#D4AF37]" data-testid={`stat-${stat.label.toLowerCase().replace(" ", "-")}`}>
-                  {stat.value}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <Card key={index} className="shadow-md hover:shadow-lg transition-all border-[#D4AF37]/20">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        {stat.label}
+                      </p>
+                      <div className={`text-4xl font-bold ${stat.color}`} data-testid={`stat-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}>
+                        {stat.value}
+                      </div>
+                    </div>
+                    <div className={`p-3 rounded-full bg-${stat.color.split('-')[1]}-100 dark:bg-${stat.color.split('-')[1]}-900/20`}>
+                      <Icon className={`w-8 h-8 ${stat.color}`} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         <div>
@@ -248,6 +259,7 @@ export default function OwnerDashboard() {
           }}
         />
       </div>
+      <Footer />
     </div>
   );
 }

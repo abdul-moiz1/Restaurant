@@ -43,7 +43,7 @@ export default function Signup() {
             title: "Account created!",
             description: "Welcome to Gourmet Haven.",
           });
-          setLocation(resultUserData.role === "owner" ? "/owner" : "/customer");
+          setLocation(resultUserData.role === "owner" ? "/dashboard" : "/menu");
         }
       } else if (pendingCredentials) {
         await signup(pendingCredentials.email, pendingCredentials.password, pendingCredentials.displayName, role);
@@ -51,7 +51,7 @@ export default function Signup() {
           title: "Account created!",
           description: "Welcome to Gourmet Haven.",
         });
-        setLocation(role === "owner" ? "/owner" : "/customer");
+        setLocation(role === "owner" ? "/dashboard" : "/menu");
       }
     } catch (error: any) {
       toast({

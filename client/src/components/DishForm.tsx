@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { storage } from "@/lib/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { Upload, Link as LinkIcon, Loader2 } from "lucide-react";
@@ -18,8 +20,10 @@ interface DishFormProps {
     description: string;
     price: number;
     imageUrl: string;
-    tags: string[];
+    tags?: string[];
     available: boolean;
+    cuisineType?: string;
+    dietary?: string[];
   };
   isOpen: boolean;
   onSubmit: (dish: any) => void;
@@ -35,6 +39,8 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
     imageUrl: "",
     tags: "",
     available: true,
+    cuisineType: "",
+    dietary: [] as string[],
   });
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -49,6 +55,8 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
         imageUrl: dish?.imageUrl || "",
         tags: dish?.tags?.join(", ") || "",
         available: dish?.available ?? true,
+        cuisineType: dish?.cuisineType || "",
+        dietary: dish?.dietary || [],
       });
       setSelectedFile(null);
       setUploadProgress(0);
@@ -60,11 +68,13 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
         imageUrl: "",
         tags: "",
         available: true,
+        cuisineType: "",
+        dietary: [],
       });
       setSelectedFile(null);
       setUploadProgress(0);
     }
-  }, [isOpen, dish?.id, dish?.name, dish?.description, dish?.price, dish?.imageUrl, dish?.tags, dish?.available]);
+  }, [isOpen, dish?.id, dish?.name, dish?.description, dish?.price, dish?.imageUrl, dish?.tags, dish?.available, dish?.cuisineType, dish?.dietary]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -162,6 +172,8 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
         imageUrl: finalImageUrl,
         tags: formData.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
         price: Number(formData.price),
+        cuisineType: formData.cuisineType || undefined,
+        dietary: formData.dietary,
       });
       
       setFormData({
@@ -170,6 +182,8 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
         price: 0,
         imageUrl: "",
         tags: "",
+        cuisineType: "",
+        dietary: [],
         available: true,
       });
       setSelectedFile(null);
@@ -343,6 +357,50 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
             </Tabs>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="cuisineType">Cuisine Type</Label>
+              <Select value={formData.cuisineType} onValueChange={(value) => setFormData({ ...formData, cuisineType: value })}>
+                <SelectTrigger data-testid="select-cuisine-type">
+                  <SelectValue placeholder="Select cuisine" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Italian">Italian</SelectItem>
+                  <SelectItem value="Asian">Asian</SelectItem>
+                  <SelectItem value="American">American</SelectItem>
+                  <SelectItem value="Mediterranean">Mediterranean</SelectItem>
+                  <SelectItem value="Desserts">Desserts</SelectItem>
+                  <SelectItem value="Mexican">Mexican</SelectItem>
+                  <SelectItem value="French">French</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Dietary Preferences</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {['Vegan', 'Keto', 'Gluten-Free', 'Vegetarian'].map((dietary) => (
+                  <div key={dietary} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`dietary-${dietary}`}
+                      checked={formData.dietary.includes(dietary)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setFormData({ ...formData, dietary: [...formData.dietary, dietary] });
+                        } else {
+                          setFormData({ ...formData, dietary: formData.dietary.filter(d => d !== dietary) });
+                        }
+                      }}
+                      data-testid={`checkbox-dietary-${dietary.toLowerCase()}`}
+                    />
+                    <Label htmlFor={`dietary-${dietary}`} className="cursor-pointer text-sm">
+                      {dietary}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="tags">Tags (comma-separated)</Label>
             <Input
@@ -350,7 +408,7 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
               data-testid="input-dish-tags"
               value={formData.tags}
               onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-              placeholder="e.g., Vegan, Spicy, Italian"
+              placeholder="e.g., Spicy, Popular, Chef's Special"
             />
             {formData.tags && (
               <div className="flex flex-wrap gap-1.5 mt-2">

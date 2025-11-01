@@ -17,12 +17,12 @@ export const dishSchema = z.object({
   name: z.string(),
   description: z.string(),
   price: z.number(),
-  tags: z.array(z.string()),
-  imageUrl: z.string().url(),
+  tags: z.array(z.string()).optional(),
+  imageUrl: z.string(),
   available: z.boolean(),
-  dietaryType: z.enum(["Vegan", "Vegetarian", "Pescatarian", "All"]).optional(),
-  allergens: z.array(z.string()).optional(),
-  spiceLevel: z.number().min(0).max(5).optional(),
+  cuisineType: z.string().optional(),
+  dietary: z.array(z.string()).optional(),
+  ownerId: z.string().optional(),
 });
 
 export type Dish = z.infer<typeof dishSchema>;

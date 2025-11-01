@@ -6,6 +6,7 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import MenuCard from "@/components/MenuCard";
+import Footer from "@/components/Footer";
 import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import heroImage from "@assets/generated_images/Restaurant_hero_background_image_62e3db83.png";
@@ -123,20 +124,21 @@ export default function Home() {
 
         <div className="relative z-10 text-center text-white max-w-4xl px-4">
           <h1 className="text-5xl lg:text-7xl font-serif font-bold mb-6 tracking-tight animate-fade-up">
-            Elevate Your Dining Experience
+            Welcome to Gourmet Haven 🍽️
           </h1>
           <p className="text-xl lg:text-2xl mb-8 text-white/90 font-light animate-fade-up" style={{ animationDelay: '0.2s' }}>
-            Refined global cuisine, curated for your taste
+            Experience Fine Dining at Home
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-up" style={{ animationDelay: '0.4s' }}>
-            <Button
-              onClick={scrollToPreferences}
-              size="lg"
-              className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white px-8 shadow-lg"
-              data-testid="button-hero-preferences"
-            >
-              Explore Menu
-            </Button>
+            <Link href="/menu">
+              <Button
+                size="lg"
+                className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white px-8 shadow-lg"
+                data-testid="button-view-menu"
+              >
+                View Menu
+              </Button>
+            </Link>
             <Link href="/signup">
               <Button
                 size="lg"
@@ -304,61 +306,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="relative bg-gradient-to-br from-[#FAF7F2] to-[#F5EFE6] dark:from-background dark:to-background border-t py-16 px-4 overflow-hidden">
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute top-10 left-10 animate-float">🍽️</div>
-          <div className="absolute top-20 right-20 animate-float" style={{ animationDelay: '0.5s' }}>🍷</div>
-          <div className="absolute bottom-10 left-1/4 animate-float" style={{ animationDelay: '1s' }}>🥂</div>
-          <div className="absolute bottom-20 right-1/4 animate-float" style={{ animationDelay: '1.5s' }}>🍴</div>
-        </div>
-        
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid md:grid-cols-3 gap-12 mb-12">
-            <div className="text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                <UtensilsCrossed className="w-8 h-8 text-[#D4AF37]" />
-                <span className="text-2xl font-serif font-bold">Gourmet Haven</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Elevating dining experiences since 2025
-              </p>
-            </div>
-
-            <div className="text-center">
-              <h3 className="font-semibold mb-4">Contact Us</h3>
-              <div className="space-y-3 text-sm text-muted-foreground">
-                <div className="flex items-center justify-center gap-2 hover:text-[#D4AF37] transition-colors cursor-pointer">
-                  <MapPin className="w-4 h-4" />
-                  <span>123 Gourmet Street, Culinary City</span>
-                </div>
-                <div className="flex items-center justify-center gap-2 hover:text-[#D4AF37] transition-colors cursor-pointer">
-                  <Phone className="w-4 h-4" />
-                  <span>+1 (555) 123-4567</span>
-                </div>
-                <div className="flex items-center justify-center gap-2 hover:text-[#D4AF37] transition-colors cursor-pointer">
-                  <Mail className="w-4 h-4" />
-                  <span>info@gourmethaven.com</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="text-center md:text-right">
-              <h3 className="font-semibold mb-4">Quick Links</h3>
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <div className="hover:text-[#D4AF37] transition-colors cursor-pointer">About</div>
-                <div className="hover:text-[#D4AF37] transition-colors cursor-pointer">Contact</div>
-                <div className="hover:text-[#D4AF37] transition-colors cursor-pointer">Privacy Policy</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center pt-8 border-t border-border">
-            <p className="text-sm text-muted-foreground">
-              © 2025 Gourmet Haven. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

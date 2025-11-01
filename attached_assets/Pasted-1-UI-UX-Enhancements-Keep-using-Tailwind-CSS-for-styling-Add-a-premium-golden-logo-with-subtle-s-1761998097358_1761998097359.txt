@@ -1,0 +1,176 @@
+1. UI/UX Enhancements
+
+Keep using Tailwind CSS for styling.
+
+Add a premium golden logo with subtle shimmer animation in the navbar.
+
+Improve home page hero section:
+
+Full-screen restaurant background.
+
+Dark gradient overlay.
+
+Headline: “Welcome to Gourmet Haven 🍽️”
+
+Subtext: “Experience Fine Dining at Home”
+
+Button: “View Menu”
+
+Smooth fade-in animations for text and buttons.
+
+Add hover zoom effect to the background image.
+
+In navbar:
+
+If user not logged in → show Login / Sign Up
+
+If user logged in → show Logout and hide Login button.
+
+Add a footer:
+
+Gold-accent background with subtle gradient.
+
+Animated icons (plates, cups, utensils) using Tailwind keyframes.
+
+Contact info (email, phone, address).
+
+Add “© 2025 Gourmet Haven” at the bottom.
+
+🍽️ 2. Menu Page Fix & Improvements
+
+Menu page should load for everyone (even without login).
+
+Fetch menu items from Firestore (menu collection).
+
+Add sample menu items automatically if collection is empty:
+
+Grilled Salmon — $25 — “Fresh Atlantic salmon with lemon butter sauce”
+
+Truffle Pasta — $18 — “Creamy pasta with white truffle oil”
+
+Caesar Salad — $10 — “Crisp romaine with parmesan and dressing”
+
+Chocolate Lava Cake — $12 — “Rich molten chocolate dessert”
+
+Each dish card:
+
+Image, title, price, description.
+
+“Add to Cart” button for customers.
+
+Hover lift animation (hover:scale-105 hover:shadow-xl).
+
+Responsive layout: grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6.
+
+🎛️ 3. Filters / Preferences (on Menu Page)
+
+Move filters to the top of Menu page (not separate page).
+
+Add a horizontal FilterBar above the menu:
+
+Dropdown: Cuisine Type (e.g., Italian, Asian, Desserts)
+
+Checkboxes: Vegan, Keto, Gluten-Free
+
+Slider: Price Range
+
+“Apply Filters” button with gold gradient hover.
+
+Filters update menu in real time (client-side filtering is fine).
+
+Style filter bar with glassy background (backdrop-blur-lg bg-white/20).
+
+🧍‍♂️ 4. Customer Page Fix
+
+When a customer logs in, redirect them to the Menu page.
+
+Show their name on navbar: “Welcome, [Name]”.
+
+Hide login/signup buttons when logged in.
+
+Make sure customer login page doesn’t stay blank — if blank, redirect to /menu.
+
+Only require login when they try to checkout (not for browsing or filtering).
+
+🧑‍🍳 5. Owner Dashboard
+
+Owner gets redirected to /dashboard after login.
+
+Dashboard shows:
+
+Stats: Total Dishes, Available, Out of Stock.
+
+Table of menu items with edit/delete buttons.
+
+“Add Dish” button → modal with form (Name, Price, Description, Image).
+
+Store dishes in Firestore under menu collection.
+
+Update real-time when items are added/edited/deleted.
+
+🔐 6. Firebase Integration
+
+Ensure Firebase Auth + Firestore are properly configured.
+
+Schema:
+
+users/{uid}: {
+  name: string;
+  email: string;
+  role: "customer" | "owner";
+}
+
+menu/{id}: {
+  name: string;
+  price: number;
+  description: string;
+  imageUrl: string;
+  available: boolean;
+  cuisineType: string;
+  dietary: string[];
+}
+
+
+When user signs up:
+
+Ask “Are you a Customer or Owner?”
+
+Store role in users collection.
+
+🎨 7. Animations & Tailwind Additions
+
+Add these keyframes to tailwind.config.js:
+
+extend: {
+  keyframes: {
+    shimmer: {
+      '0%': { backgroundPosition: '-200% 0' },
+      '100%': { backgroundPosition: '200% 0' },
+    },
+  },
+  animation: {
+    shimmer: 'shimmer 3s infinite linear',
+  },
+}
+
+
+Apply shimmer to logo and footer icons.
+
+Smooth transitions across buttons and modals.
+
+🧾 8. Final Behavior Summary
+
+Menu is public.
+
+Filters live at top of Menu.
+
+Customers redirected to Menu after login.
+
+Owners redirected to Dashboard after login.
+
+Add sample dishes on first load.
+
+Improved animations, fonts, and layout using Tailwind.
+
+✅ Prompt Goal:
+Upgrade my existing React + TypeScript + Tailwind + Firebase restaurant app to a fully functional, premium-looking experience with working authentication redirections, animated UI, sample menu items, and a fixed customer login flow — without rebuilding from scratch.
