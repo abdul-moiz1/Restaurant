@@ -6,7 +6,15 @@ Gourmet Haven is a dual-role restaurant platform built with React and Firebase t
 
 ## Recent Changes (November 2025)
 
-**Complete UI Redesign (Latest)**
+**Latest Update: Fixed DishForm for Complete Filtering Functionality**
+- Added cuisineType and dietary fields to DishForm state and submission
+- Implemented Select dropdown for cuisine type selection (Italian, Asian, American, Mediterranean, Desserts, Mexican, French)
+- Added Checkbox inputs for dietary preferences (Vegan, Keto, Gluten-Free, Vegetarian)
+- Owners can now properly tag dishes with cuisine type and dietary info when adding/editing
+- All newly created dishes now participate in Menu page filtering
+- Fixed critical issue where dishes without metadata would be excluded from filters
+
+**Complete UI Redesign**
 - Redesigned home page with animated golden logo (UtensilsCrossed icon with pulse and rotate animations)
 - Enhanced hero section with "Elevate Your Dining Experience" headline and "Refined global cuisine, curated for your taste" tagline
 - Moved preferences section below hero with cuisine filters, dietary restrictions, price range slider
@@ -14,6 +22,7 @@ Gourmet Haven is a dual-role restaurant platform built with React and Firebase t
 - Created elegant footer with animated plate and fork icons, contact information, and copyright
 - Implemented comprehensive Framer Motion animations across all pages with hover/tap effects
 - Added glass morphism effects on cards with backdrop blur and subtle shadows
+- Enhanced Owner Dashboard with icon-based statistics cards showing Total Dishes, Available, and Out of Stock counts
 
 **Shopping Cart System**
 - Created CartContext with React Context API for global cart state management
@@ -97,7 +106,7 @@ Preferred communication style: Simple, everyday language.
   - Signup (/signup) - Account creation with role selection
 - Protected routes with role-based access control:
   - Cart (/cart) - Shopping cart page (requires "customer" role)
-  - Owner Dashboard (/owner) - Menu management (requires "owner" role)
+  - Owner Dashboard (/dashboard) - Menu management (requires "owner" role)
 - Automatic redirects based on authentication status and user role
 - Uses wouter for SPA navigation to preserve React Context state
 
@@ -136,7 +145,7 @@ Preferred communication style: Simple, everyday language.
 - Collections:
   - `users/{uid}`: User profile data including role, email, displayName, createdAt
   - `menu`: Restaurant menu items with dish details
-- Menu items include: name, description, price, imageUrl, tags, available status, ownerId, dietaryType (optional), allergens (optional), spiceLevel (optional)
+- Menu items include: name, description, price, imageUrl, tags, available status, ownerId, cuisineType (optional), dietary array (optional)
 - Customer preferences stored in localStorage for filtering menu items
 - Queries filtered by ownerId for owner-specific menu management
 
