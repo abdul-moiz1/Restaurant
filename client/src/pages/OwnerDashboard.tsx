@@ -133,6 +133,28 @@ export default function OwnerDashboard() {
     }
   };
 
+  const handlePublishAll = async () => {
+    try {
+      const updatePromises = dishes
+        .filter(d => !d.available)
+        .map(d => updateDoc(doc(db, "menu", d.id), { available: true }));
+      
+      await Promise.all(updatePromises);
+      setDishes(dishes.map(d => ({ ...d, available: true })));
+      toast({
+        title: "All Dishes Published",
+        description: "All your menu items are now available to customers.",
+      });
+    } catch (error) {
+      console.error("Error publishing dishes:", error);
+      toast({
+        title: "Error",
+        description: "Failed to publish all dishes.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const stats = [
     { label: "Total Dishes", value: dishes.length },
     { label: "Available", value: dishes.filter((d) => d.available).length },
@@ -155,10 +177,20 @@ export default function OwnerDashboard() {
             <h1 className="text-4xl font-serif font-bold mb-2">Owner Dashboard</h1>
             <p className="text-muted-foreground">Manage your restaurant menu</p>
           </div>
-          <Button onClick={handleAddDish} data-testid="button-add-dish">
-            <Plus className="w-4 h-4 mr-2" />
-            Add New Dish
-          </Button>
+          <div className="flex gap-3">
+            <Button onClick={handleAddDish} data-testid="button-add-dish">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Dish
+            </Button>
+            <Button 
+              onClick={handlePublishAll} 
+              variant="outline"
+              data-testid="button-publish-all"
+              disabled={dishes.filter(d => !d.available).length === 0}
+            >
+              Publish All
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

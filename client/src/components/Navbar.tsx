@@ -14,44 +14,27 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
   const [location] = useLocation();
 
   return (
-    <nav className="sticky top-0 z-50 backdrop-blur-sm bg-background/95 border-b">
+    <nav className="sticky top-0 z-50 bg-background border-b">
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16">
           <Link 
             href="/"
             data-testid="link-home"
-            className="text-2xl font-serif font-bold text-foreground hover:text-primary transition-colors flex items-center gap-2"
+            className="text-xl font-serif font-bold text-foreground hover:text-primary transition-colors flex items-center gap-2"
           >
-            <span className="text-3xl">🍽️</span>
+            <span className="text-2xl">🍽️</span>
             Gourmet Haven
           </Link>
 
-          <div className="flex items-center gap-4">
-            <Link 
-              href="/"
-              data-testid="link-nav-home"
-              className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-                location === "/" ? "text-primary font-medium" : "text-foreground hover:text-primary"
-              }`}
-            >
-              <Home className="w-4 h-4" />
-              Home
-            </Link>
-
+          <div className="flex items-center gap-6">
             {user ? (
               <>
-                <Link 
-                  href={user.role === "owner" ? "/owner" : "/customer"}
-                  data-testid="link-dashboard"
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-                    location.includes(user.role) ? "text-primary font-medium" : "text-foreground hover:text-primary"
-                  }`}
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                  Dashboard
-                </Link>
+                <span className="text-sm text-muted-foreground">
+                  Signed in as a <span className="font-medium text-foreground">({user.role})</span>
+                </span>
                 <Button
-                  variant="outline"
+                  variant="ghost"
+                  size="sm"
                   onClick={onLogout}
                   data-testid="button-logout"
                   className="flex items-center gap-2"
@@ -62,11 +45,19 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
               </>
             ) : (
               <>
+                <Link 
+                  href="/"
+                  data-testid="link-nav-home"
+                  className="flex items-center gap-1 text-foreground hover:text-primary transition-colors"
+                >
+                  <Home className="w-4 h-4" />
+                  Home
+                </Link>
                 <Link href="/login" data-testid="link-login">
-                  <Button variant="outline">Login</Button>
+                  <Button variant="ghost" size="sm">Login</Button>
                 </Link>
                 <Link href="/signup" data-testid="link-signup">
-                  <Button variant="default">Sign Up</Button>
+                  <Button size="sm">Sign Up</Button>
                 </Link>
               </>
             )}
