@@ -325,10 +325,12 @@ export default function Home() {
         
         <div className="max-w-6xl mx-auto relative">
           <div className="text-center mb-12">
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-8">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/20 via-[#FFD700]/30 to-[#D4AF37]/20 blur-xl"></div>
-                <UtensilsCrossed className="w-12 h-12 text-[#D4AF37] relative animate-pulse" />
+                <div className="absolute inset-0 bg-[#D4AF37]/30 blur-3xl scale-150 animate-glow"></div>
+                <div className="absolute inset-0 bg-[#FFD700]/20 blur-2xl scale-125"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/40 via-[#FFD700]/50 to-[#D4AF37]/40 blur-xl"></div>
+                <UtensilsCrossed className="w-16 h-16 text-[#D4AF37] relative drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
               </div>
             </div>
             <h2 className="text-3xl font-serif font-bold text-foreground mb-2">The Gourmet Experience</h2>
