@@ -270,8 +270,8 @@ export default function Home() {
                 ))}
               </div>
               {menuItems.length > 0 && previewItems.length > 0 && (
-                <div className="relative mt-12 overflow-hidden rounded-2xl group/preview">
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background pointer-events-none z-10" />
+                <div className="relative mt-12 overflow-hidden rounded-2xl group/preview hover:scale-105 transition-transform duration-700">
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background pointer-events-none z-10 transition-all duration-700" />
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {previewItems.map((dish) => (
                       <div 
