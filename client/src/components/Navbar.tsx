@@ -26,12 +26,38 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
             Gourmet Haven
           </Link>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
+            <Link 
+              href="/"
+              data-testid="link-nav-home"
+              className={`text-sm hover:text-primary transition-colors ${location === "/" ? "text-primary font-medium" : "text-foreground"}`}
+            >
+              Home
+            </Link>
+            <Link 
+              href="/menu"
+              data-testid="link-nav-menu"
+              className={`text-sm hover:text-primary transition-colors ${location === "/menu" ? "text-primary font-medium" : "text-foreground"}`}
+            >
+              Menu
+            </Link>
+            <Link 
+              href="/preferences"
+              data-testid="link-nav-preferences"
+              className={`text-sm hover:text-primary transition-colors ${location === "/preferences" ? "text-primary font-medium" : "text-foreground"}`}
+            >
+              Preferences
+            </Link>
+            
             {user ? (
               <>
-                <span className="text-sm text-muted-foreground">
-                  Signed in as a <span className="font-medium text-foreground">({user.role})</span>
-                </span>
+                <Link 
+                  href={user.role === "owner" ? "/owner" : "/checkout"}
+                  data-testid="link-nav-dashboard"
+                  className={`text-sm hover:text-primary transition-colors ${location === (user.role === "owner" ? "/owner" : "/checkout") ? "text-primary font-medium" : "text-foreground"}`}
+                >
+                  {user.role === "owner" ? "Dashboard" : "Checkout"}
+                </Link>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -45,19 +71,11 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
               </>
             ) : (
               <>
-                <Link 
-                  href="/"
-                  data-testid="link-nav-home"
-                  className="flex items-center gap-1 text-foreground hover:text-primary transition-colors"
-                >
-                  <Home className="w-4 h-4" />
-                  Home
-                </Link>
                 <Link href="/login" data-testid="link-login">
                   <Button variant="ghost" size="sm">Login</Button>
                 </Link>
                 <Link href="/signup" data-testid="link-signup">
-                  <Button size="sm">Sign Up</Button>
+                  <Button size="sm" className="bg-primary hover:bg-primary/90">Sign Up</Button>
                 </Link>
               </>
             )}

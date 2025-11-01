@@ -2,13 +2,16 @@ import { Switch, Route, useLocation, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as HotToaster } from "react-hot-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
-import CustomerDashboard from "@/pages/CustomerDashboard";
+import Menu from "@/pages/Menu";
+import Preferences from "@/pages/Preferences";
+import Checkout from "@/pages/Checkout";
 import OwnerDashboard from "@/pages/OwnerDashboard";
 import NotFound from "@/pages/not-found";
 
@@ -55,8 +58,10 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/login" component={Login} />
         <Route path="/signup" component={Signup} />
-        <Route path="/customer">
-          {() => <ProtectedRoute component={CustomerDashboard} requiredRole="customer" />}
+        <Route path="/menu" component={Menu} />
+        <Route path="/preferences" component={Preferences} />
+        <Route path="/checkout">
+          {() => <ProtectedRoute component={Checkout} requiredRole="customer" />}
         </Route>
         <Route path="/owner">
           {() => <ProtectedRoute component={OwnerDashboard} requiredRole="owner" />}
@@ -73,6 +78,7 @@ function App() {
       <AuthProvider>
         <TooltipProvider>
           <Toaster />
+          <HotToaster position="top-right" />
           <Router />
         </TooltipProvider>
       </AuthProvider>
