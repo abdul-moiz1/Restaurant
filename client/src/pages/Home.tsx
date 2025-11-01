@@ -300,6 +300,14 @@ export default function Home() {
         </div>
       </section>
 
+      <div className="relative h-24 flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4AF37]/10 to-transparent"></div>
+        <div className="w-full max-w-4xl h-[3px] relative overflow-hidden rounded-full">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent animate-[shimmer_3s_ease-in-out_infinite]"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37] opacity-50"></div>
+        </div>
+      </div>
+
       <section className="py-24 px-4 bg-gradient-to-br from-[#FAF7F2] via-white to-[#FAF7F2] dark:from-background dark:via-background dark:to-background relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
