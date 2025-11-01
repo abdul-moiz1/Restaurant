@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route, useLocation, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
@@ -12,25 +12,55 @@ import CustomerDashboard from "@/pages/CustomerDashboard";
 import OwnerDashboard from "@/pages/OwnerDashboard";
 import NotFound from "@/pages/not-found";
 
+function ProtectedRoute({ component: Component, requiredRole }: { component: any; requiredRole?: "owner" | "customer" }) {
+  const { userData, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg text-muted-foreground">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return <Redirect to="/login" />;
+  }
+
+  if (requiredRole && userData.role !== requiredRole) {
+    return <Redirect to={userData.role === "owner" ? "/owner" : "/customer"} />;
+  }
+
+  return <Component />;
+}
+
 function Router() {
   const [, setLocation] = useLocation();
-  const [user, setUser] = useState<{ email: string; role: "owner" | "customer" } | null>(null);
+  const { userData, logout } = useAuth();
 
-  const handleLogout = () => {
-    setUser(null);
+  const handleLogout = async () => {
+    await logout();
     setLocation("/");
-    console.log("User logged out");
   };
 
   return (
     <>
-      <Navbar user={user} onLogout={handleLogout} />
+      <Navbar 
+        user={userData ? { email: userData.email, role: userData.role } : null} 
+        onLogout={handleLogout} 
+      />
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/login" component={Login} />
         <Route path="/signup" component={Signup} />
-        <Route path="/customer" component={CustomerDashboard} />
-        <Route path="/owner" component={OwnerDashboard} />
+        <Route path="/customer">
+          {() => <ProtectedRoute component={CustomerDashboard} requiredRole="customer" />}
+        </Route>
+        <Route path="/owner">
+          {() => <ProtectedRoute component={OwnerDashboard} requiredRole="owner" />}
+        </Route>
         <Route component={NotFound} />
       </Switch>
     </>
@@ -40,10 +70,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
