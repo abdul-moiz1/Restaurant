@@ -129,24 +129,14 @@ export default function Home() {
           <p className="text-xl lg:text-2xl mb-8 text-white/90 font-light animate-fade-up" style={{ animationDelay: '0.2s' }}>
             Experience Fine Dining at Home
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-up" style={{ animationDelay: '0.4s' }}>
+          <div className="flex justify-center items-center animate-fade-up" style={{ animationDelay: '0.4s' }}>
             <Link href="/menu">
               <Button
                 size="lg"
-                className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white px-8 shadow-lg"
+                className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white px-12 py-6 text-lg rounded-lg shadow-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(212,175,55,0.6)] hover:scale-105"
                 data-testid="button-view-menu"
               >
                 View Menu
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button
-                size="lg"
-                variant="outline"
-                className="backdrop-blur-md bg-white/10 border-white text-white hover:bg-white/20 px-8"
-                data-testid="button-hero-signup"
-              >
-                Sign Up
               </Button>
             </Link>
           </div>
@@ -290,19 +280,25 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 px-4 bg-card dark:bg-background">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl lg:text-4xl font-serif font-bold mb-6">
-            Ready to Start Your Culinary Journey?
-          </h2>
-          <p className="text-lg text-muted-foreground mb-8">
-            Join Gourmet Haven today and experience the finest in dining
-          </p>
-          <Link href="/signup">
-            <Button size="lg" className="px-8 bg-[#D4AF37] hover:bg-[#D4AF37]/90" data-testid="button-footer-signup">
-              Sign Up Now
-            </Button>
-          </Link>
+      <section className="py-32 px-4 bg-card dark:bg-background">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex justify-center items-center gap-8 lg:gap-12">
+            <span className="text-6xl lg:text-7xl animate-shimmer-icon" style={{ animationDelay: '0s', color: '#D4AF37' }}>
+              🍽️
+            </span>
+            <span className="text-6xl lg:text-7xl animate-shimmer-icon" style={{ animationDelay: '0.2s', color: '#D4AF37' }}>
+              🥂
+            </span>
+            <span className="text-6xl lg:text-7xl animate-shimmer-icon" style={{ animationDelay: '0.4s', color: '#D4AF37' }}>
+              🍷
+            </span>
+            <span className="text-6xl lg:text-7xl animate-shimmer-icon" style={{ animationDelay: '0.6s', color: '#D4AF37' }}>
+              🍰
+            </span>
+            <span className="text-6xl lg:text-7xl animate-shimmer-icon" style={{ animationDelay: '0.8s', color: '#D4AF37' }}>
+              🍴
+            </span>
+          </div>
         </div>
       </section>
 

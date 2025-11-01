@@ -37,7 +37,7 @@ export default function Login() {
 
   useEffect(() => {
     if (userData) {
-      if (userData.role === "owner" && !pinVerified) {
+      if (userData.role === "owner" && selectedRole === "owner" && !pinVerified) {
         setShowPinModal(true);
       } else if (userData.role === "customer") {
         setLocation("/menu");
@@ -45,7 +45,7 @@ export default function Login() {
         setLocation("/dashboard");
       }
     }
-  }, [userData, pinVerified, setLocation]);
+  }, [userData, pinVerified, setLocation, selectedRole]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
