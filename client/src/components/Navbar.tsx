@@ -5,6 +5,7 @@ import { LogOut, ShoppingCart, UtensilsCrossed } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useState } from "react";
 import RoleSelectionModal from "./RoleSelectionModal";
+import CartPanel from "./CartPanel";
 
 interface NavbarProps {
   user?: {
@@ -19,6 +20,7 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
   const [location, setLocation] = useLocation();
   const { itemCount } = useCart();
   const [showRoleModal, setShowRoleModal] = useState(false);
+  const [showCartPanel, setShowCartPanel] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
 
   const handleLoginClick = () => {
@@ -58,25 +60,21 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
                   Welcome, <span className="text-[#D4AF37] font-medium">{user.displayName || user.email.split('@')[0]}</span>
                 </span>
                 {user.role === "customer" && (
-                  <Link 
-                    href="/cart"
-                    data-testid="link-nav-cart"
-                    className="relative"
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowCartPanel(true)}
+                    data-testid="button-nav-cart"
+                    className="flex items-center gap-2 relative"
                   >
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={`flex items-center gap-2 ${location === "/cart" ? "text-[#D4AF37]" : ""}`}
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                      Cart
-                      {itemCount > 0 && (
-                        <Badge className="ml-1 bg-[#D4AF37] text-white px-2 py-0.5 text-xs" data-testid="badge-cart-count">
-                          {itemCount}
-                        </Badge>
-                      )}
-                    </Button>
-                  </Link>
+                    <ShoppingCart className="w-4 h-4" />
+                    Cart
+                    {itemCount > 0 && (
+                      <Badge className="ml-1 bg-[#D4AF37] text-white px-2 py-0.5 text-xs" data-testid="badge-cart-count">
+                        {itemCount}
+                      </Badge>
+                    )}
+                  </Button>
                 )}
                 {user.role === "owner" && (
                   <Link 
@@ -127,6 +125,10 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
         onClose={() => setShowRoleModal(false)}
         onSelectRole={handleRoleSelect}
         mode={authMode}
+      />
+      <CartPanel
+        isOpen={showCartPanel}
+        onClose={() => setShowCartPanel(false)}
       />
     </nav>
   );

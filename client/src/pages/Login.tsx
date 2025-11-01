@@ -25,7 +25,7 @@ export default function Login() {
     const role = localStorage.getItem("selectedRole") as "owner" | "customer" | null;
     if (role) {
       setSelectedRole(role);
-    } else if (!userData) {
+    } else if (!userData && !loading) {
       setLocation("/");
       toast({
         title: "Please select a role",
@@ -33,7 +33,7 @@ export default function Login() {
         variant: "destructive",
       });
     }
-  }, [setLocation, toast, userData]);
+  }, [setLocation, toast, userData, loading]);
 
   useEffect(() => {
     if (userData && !loading) {
