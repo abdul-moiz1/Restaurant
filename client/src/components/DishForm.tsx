@@ -167,14 +167,21 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
         return;
       }
 
-      onSubmit({
-        ...formData,
+      const dishData: any = {
+        name: formData.name,
+        description: formData.description,
         imageUrl: finalImageUrl,
         tags: formData.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
         price: Number(formData.price),
-        cuisineType: formData.cuisineType || undefined,
+        available: formData.available,
         dietary: formData.dietary,
-      });
+      };
+      
+      if (formData.cuisineType) {
+        dishData.cuisineType = formData.cuisineType;
+      }
+      
+      onSubmit(dishData);
       
       setFormData({
         name: "",
