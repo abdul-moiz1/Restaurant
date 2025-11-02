@@ -42,14 +42,6 @@ export default function MenuCard({ dish, isOwner, onEdit, onDelete }: MenuCardPr
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!userData) {
-      toast({
-        title: "✨ Premium Access Required",
-        description: "Please sign in to add exquisite dishes to your collection.",
-        className: "border-[#d4af37] bg-gradient-to-br from-[#fafafa] to-white border-2 shadow-lg",
-      });
-      return;
-    }
     
     if (dish.available) {
       addToCart({
