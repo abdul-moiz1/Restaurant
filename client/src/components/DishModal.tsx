@@ -80,11 +80,11 @@ export default function DishModal({ dish, open, onClose }: DishModalProps) {
           </button>
           
           {/* Main Image */}
-          <div className="relative h-64 md:h-72 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 overflow-hidden">
+          <div className="relative h-80 md:h-96 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
             <img
               src={allImages[currentImageIndex]}
               alt={dish.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800';
