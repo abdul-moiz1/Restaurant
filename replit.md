@@ -6,6 +6,14 @@ Gourmet Haven is a dual-role restaurant platform built with React and Firebase, 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+### November 2, 2025
+- **Toast Notifications**: Updated toast auto-dismiss delay from 16+ minutes to 5 seconds for better UX
+- **Login Page Enhancements**:
+  - Fixed role switching: Login page now updates dynamically when user changes role from navbar via localStorage listener
+  - Added "Forgot password?" link that displays a toast notification
+  - Added "Sign up" button for customers that redirects to signup page
+
 ## System Architecture
 
 ### Frontend Architecture
