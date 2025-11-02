@@ -108,7 +108,7 @@ export default function Home() {
       <section id="highlights" className="py-24 px-4 bg-gradient-to-br from-[#FAF7F2] to-white dark:from-background dark:to-background">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="group text-center p-8 rounded-2xl bg-white/50 dark:bg-card/50 backdrop-blur-sm border border-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all duration-500 hover:shadow-xl hover:-translate-y-2">
+            <div className="group text-center p-8 rounded-2xl bg-white dark:bg-card backdrop-blur-sm border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-500 hover:shadow-xl hover:-translate-y-2 shadow-md">
               <div className="flex justify-center mb-6">
                 <div className="relative">
                   <div className="absolute inset-0 bg-[#D4AF37]/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500"></div>
@@ -117,13 +117,13 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <h3 className="text-2xl font-serif font-bold mb-3">Curated Excellence</h3>
+              <h3 className="text-2xl font-serif font-bold mb-3 text-foreground">Curated Excellence</h3>
               <p className="text-muted-foreground leading-relaxed">
                 Every dish is carefully crafted by expert chefs using premium ingredients
               </p>
             </div>
 
-            <div className="group text-center p-8 rounded-2xl bg-white/50 dark:bg-card/50 backdrop-blur-sm border border-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all duration-500 hover:shadow-xl hover:-translate-y-2">
+            <div className="group text-center p-8 rounded-2xl bg-white dark:bg-card backdrop-blur-sm border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-500 hover:shadow-xl hover:-translate-y-2 shadow-md">
               <div className="flex justify-center mb-6">
                 <div className="relative">
                   <div className="absolute inset-0 bg-[#D4AF37]/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500"></div>
@@ -132,13 +132,13 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <h3 className="text-2xl font-serif font-bold mb-3">Fresh & Timely</h3>
+              <h3 className="text-2xl font-serif font-bold mb-3 text-foreground">Fresh & Timely</h3>
               <p className="text-muted-foreground leading-relaxed">
                 Prepared fresh daily and delivered at your convenience
               </p>
             </div>
 
-            <div className="group text-center p-8 rounded-2xl bg-white/50 dark:bg-card/50 backdrop-blur-sm border border-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all duration-500 hover:shadow-xl hover:-translate-y-2">
+            <div className="group text-center p-8 rounded-2xl bg-white dark:bg-card backdrop-blur-sm border border-[#D4AF37]/20 hover:border-[#D4AF37]/40 transition-all duration-500 hover:shadow-xl hover:-translate-y-2 shadow-md">
               <div className="flex justify-center mb-6">
                 <div className="relative">
                   <div className="absolute inset-0 bg-[#D4AF37]/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500"></div>
@@ -147,7 +147,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <h3 className="text-2xl font-serif font-bold mb-3">Award Winning</h3>
+              <h3 className="text-2xl font-serif font-bold mb-3 text-foreground">Award Winning</h3>
               <p className="text-muted-foreground leading-relaxed">
                 Recognized for culinary excellence and exceptional dining experiences
               </p>
