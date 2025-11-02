@@ -24,13 +24,13 @@ export default function Signup() {
 
   useEffect(() => {
     const role = localStorage.getItem("selectedRole") as "owner" | "customer" | null;
-    if (role) {
+    if (role === "customer") {
       setSelectedRole(role);
     } else {
       setLocation("/");
       toast({
-        title: "Please select a role",
-        description: "Click Sign Up button to select your role first.",
+        title: "Customer signup only",
+        description: "Only customers can create new accounts. Owner accounts are pre-configured.",
         variant: "destructive",
       });
     }

@@ -21,13 +21,13 @@ export default function RoleSelectionModal({ isOpen, onClose, onSelectRole, mode
       <DialogContent className="sm:max-w-md" data-testid="modal-role-selection">
         <DialogHeader>
           <DialogTitle className="text-2xl font-serif text-center">
-            Choose Your Role
+            {mode === "signup" ? "Create Customer Account" : "Choose Your Role"}
           </DialogTitle>
           <DialogDescription className="text-center">
-            {mode === "login" ? "Select your role to log in" : "Select how you'd like to use Gourmet Haven"}
+            {mode === "login" ? "Select your role to log in" : "Sign up as a customer to browse and order"}
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-4 py-4">
+        <div className={`grid ${mode === "signup" ? "grid-cols-1" : "grid-cols-2"} gap-4 py-4`}>
           <Card
             className="p-6 cursor-pointer hover:shadow-lg hover:scale-105 transition-all border-2 border-transparent hover:border-[#D4AF37]"
             onClick={() => handleRoleSelect("customer")}
@@ -46,23 +46,25 @@ export default function RoleSelectionModal({ isOpen, onClose, onSelectRole, mode
             </div>
           </Card>
 
-          <Card
-            className="p-6 cursor-pointer hover:shadow-lg hover:scale-105 transition-all border-2 border-transparent hover:border-[#D4AF37]"
-            onClick={() => handleRoleSelect("owner")}
-            data-testid="card-role-owner"
-          >
-            <div className="flex flex-col items-center gap-3 text-center">
-              <div className="w-16 h-16 rounded-full bg-[#D4AF37]/10 flex items-center justify-center">
-                <Store className="w-8 h-8 text-[#D4AF37]" />
+          {mode === "login" && (
+            <Card
+              className="p-6 cursor-pointer hover:shadow-lg hover:scale-105 transition-all border-2 border-transparent hover:border-[#D4AF37]"
+              onClick={() => handleRoleSelect("owner")}
+              data-testid="card-role-owner"
+            >
+              <div className="flex flex-col items-center gap-3 text-center">
+                <div className="w-16 h-16 rounded-full bg-[#D4AF37]/10 flex items-center justify-center">
+                  <Store className="w-8 h-8 text-[#D4AF37]" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">Owner</h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Manage your restaurant
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-lg">Owner</h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Manage your restaurant
-                </p>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          )}
         </div>
       </DialogContent>
     </Dialog>
