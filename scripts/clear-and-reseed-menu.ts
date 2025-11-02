@@ -1,7 +1,20 @@
-import { collection, getDocs, setDoc, doc, deleteDoc } from "firebase/firestore";
-import { db } from "./firebase";
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs, deleteDoc, doc, setDoc } from "firebase/firestore";
 
-export const sampleDishes = [
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: process.env.VITE_FIREBASE_API_KEY,
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.VITE_FIREBASE_APP_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const sampleDishes = [
   {
     id: "sample-1",
     name: "Grilled Salmon Bowl",
@@ -444,35 +457,36 @@ export const sampleDishes = [
   },
 ];
 
-export async function seedSampleDishes(forceReseed: boolean = false) {
+async function clearAndReseedMenu() {
   try {
+    console.log("🔥 Clearing existing menu items...");
+    
+    // Get all existing menu items
     const menuRef = collection(db, "menu");
     const snapshot = await getDocs(menuRef);
     
-    if (forceReseed && !snapshot.empty) {
-      console.log("🔥 Force re-seeding: Clearing existing menu items...");
-      const deletePromises = snapshot.docs.map(docSnapshot => {
-        return deleteDoc(doc(db, "menu", docSnapshot.id));
-      });
-      await Promise.all(deletePromises);
-      console.log(`✅ Cleared ${snapshot.size} existing items`);
+    // Delete all existing items
+    const deletePromises = snapshot.docs.map(docSnapshot => 
+      deleteDoc(doc(db, "menu", docSnapshot.id))
+    );
+    await Promise.all(deletePromises);
+    
+    console.log(`✅ Deleted ${snapshot.size} existing items`);
+    console.log("🌱 Seeding 20 premium dishes...");
+    
+    // Add new dishes
+    for (const dish of sampleDishes) {
+      await setDoc(doc(db, "menu", dish.id), dish);
     }
     
-    if (snapshot.empty || forceReseed) {
-      console.log("🌱 Seeding sample menu items...");
-      
-      for (const dish of sampleDishes) {
-        await setDoc(doc(db, "menu", dish.id), dish);
-      }
-      
-      console.log(`✅ Successfully seeded ${sampleDishes.length} premium dishes!`);
-      return true;
-    } else {
-      console.log("Menu already has items, skipping seed.");
-      return false;
-    }
+    console.log(`✅ Successfully added ${sampleDishes.length} premium dishes!`);
+    console.log("🎉 Menu has been cleared and re-seeded with 20 dishes, each with 2-3 images!");
+    
+    process.exit(0);
   } catch (error) {
-    console.error("Error seeding sample dishes:", error);
-    return false;
+    console.error("❌ Error clearing and reseeding menu:", error);
+    process.exit(1);
   }
 }
+
+clearAndReseedMenu();

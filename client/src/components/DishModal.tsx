@@ -189,8 +189,8 @@ export default function DishModal({ dish, open, onClose }: DishModalProps) {
 
             {/* Description */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-[#333] mb-2">Description</h3>
-              <p className="text-gray-600 leading-relaxed" data-testid="text-dish-description">
+              <h3 className="text-xl font-bold text-[#333] dark:text-white mb-3">Description</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-base" data-testid="text-dish-description">
                 {dish.description}
               </p>
             </div>
@@ -231,25 +231,27 @@ export default function DishModal({ dish, open, onClose }: DishModalProps) {
             {/* Ingredients */}
             {dish.ingredients && dish.ingredients.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-[#333] mb-3">Ingredients</h3>
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                  <p className="text-gray-700 leading-relaxed" data-testid="text-ingredients">
-                    {dish.ingredients.join(", ")}
+                <h3 className="text-xl font-bold text-[#333] dark:text-white mb-3">Ingredients</h3>
+                <div className="bg-gradient-to-br from-[#FAF7F2] to-white dark:from-gray-800 dark:to-gray-900 p-5 rounded-xl border-2 border-[#d4af37]/20 shadow-md">
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-base" data-testid="text-ingredients">
+                    {dish.ingredients.join(" • ")}
                   </p>
                 </div>
               </div>
             )}
 
             {/* Add to Cart Button */}
-            <Button
-              onClick={handleAddToCart}
-              disabled={!dish.available}
-              className="w-full bg-gradient-to-r from-[#d4af37] via-[#e8c547] to-[#d4af37] hover:from-[#b89b2f] hover:via-[#d4af37] hover:to-[#b89b2f] text-white font-bold py-6 text-lg rounded-xl shadow-2xl hover:shadow-[#d4af37]/50 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-              data-testid="button-add-to-cart-modal"
-            >
-              <ShoppingCart className="w-6 h-6 mr-3" />
-              {dish.available ? `Add to Cart - $${dish.price.toFixed(2)}` : 'Currently Unavailable'}
-            </Button>
+            <div className="flex justify-center">
+              <Button
+                onClick={handleAddToCart}
+                disabled={!dish.available}
+                className="px-12 py-3 bg-gradient-to-r from-[#d4af37] via-[#e8c547] to-[#d4af37] hover:from-[#b89b2f] hover:via-[#d4af37] hover:to-[#b89b2f] text-white font-bold text-base rounded-xl shadow-lg hover:shadow-xl hover:shadow-[#d4af37]/40 transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                data-testid="button-add-to-cart-modal"
+              >
+                <ShoppingCart className="w-5 h-5 mr-2" />
+                {dish.available ? `Add to Cart - $${dish.price.toFixed(2)}` : 'Currently Unavailable'}
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>

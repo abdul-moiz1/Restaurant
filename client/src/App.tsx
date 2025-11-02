@@ -82,6 +82,7 @@ function Router() {
 
 function App() {
   useEffect(() => {
+    // Seed menu with 20 premium dishes (each with 2-3 images)
     seedSampleDishes();
   }, []);
 

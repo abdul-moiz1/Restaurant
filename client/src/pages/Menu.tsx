@@ -88,7 +88,8 @@ export default function Menu() {
   };
 
   const filterDishes = () => {
-    let filtered = dishes.filter(dish => dish.available || userData?.role === "owner");
+    // Show dishes unless explicitly unavailable (available !== false treats undefined as true)
+    let filtered = dishes.filter(dish => dish.available !== false || userData?.role === "owner");
 
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
