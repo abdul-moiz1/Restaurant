@@ -1,8 +1,9 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LogOut, ShoppingCart, UtensilsCrossed, History } from "lucide-react";
+import { LogOut, ShoppingCart, UtensilsCrossed, History, Moon, Sun } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useState } from "react";
 import RoleSelectionModal from "./RoleSelectionModal";
 import CartPanel from "./CartPanel";
@@ -19,6 +20,7 @@ interface NavbarProps {
 export default function Navbar({ user, onLogout }: NavbarProps) {
   const [location, setLocation] = useLocation();
   const { itemCount } = useCart();
+  const { theme, toggleTheme } = useTheme();
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [showCartPanel, setShowCartPanel] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
@@ -54,6 +56,20 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
           </Link>
 
           <div className="flex items-center gap-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleTheme}
+              data-testid="button-theme-toggle"
+              className="flex items-center gap-2"
+            >
+              {theme === "dark" ? (
+                <Sun className="w-4 h-4 text-[#D4AF37]" />
+              ) : (
+                <Moon className="w-4 h-4 text-[#D4AF37]" />
+              )}
+            </Button>
+
             {/* Show cart button for all users when cart has items OR for logged-in customers */}
             {(itemCount > 0 || (user && user.role === "customer")) && (!user || user.role !== "owner") && (
               <Button
