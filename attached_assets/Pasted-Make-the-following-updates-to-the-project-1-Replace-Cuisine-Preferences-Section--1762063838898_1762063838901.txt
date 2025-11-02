@@ -1,0 +1,150 @@
+Make the following updates to the project:
+
+---
+
+### 1️⃣ Replace Cuisine Preferences Section
+
+In the preferences (filters) page, replace the entire **Cuisine Preferences** section with a new **Health & Nutrition Filters** section.
+
+It should include checkboxes for:
+- Low Sugar
+- High Protein
+- Low Carb
+- Low Fat
+- High Fiber
+- Heart Healthy
+- Low Sodium
+
+Keep the existing **Dietary Filters** (Vegan, Vegetarian, etc.) below it.
+
+---
+
+### 2️⃣ Replace Price Range with Calorie Range
+
+Replace the "Price Range per Dish" slider with a **Calorie Range per Dish** slider.
+
+- Label: “Calorie Range per Dish”
+- Min label: “Min Calories”
+- Max label: “Max Calories”
+- Default range: 0 to 1000 kcal
+- Display the numeric range dynamically as the user moves the slider
+
+The “Apply Filters & View Menu” button remains unchanged, but now filters by calorie range and health filters instead of price.
+
+---
+
+### 3️⃣ Update `menu.ts` for Testing
+
+Update or create `menu.ts` with the following test data:
+
+```ts
+export const menuItems = [
+  {
+    id: "1",
+    name: "Grilled Salmon Bowl",
+    price: 18.99,
+    image: "/images/salmon-bowl.jpg",
+    tags: ["Gluten-Free", "Dairy-Free"],
+    nutrition: {
+      calories: 420,
+      sugar: 4,
+      protein: 38,
+      carbs: 20,
+      sodium: 450,
+      fiber: 3,
+      healthyTags: ["High Protein", "Low Sugar", "Heart Healthy"]
+    },
+    description: "Tender grilled salmon served with quinoa and roasted veggies."
+  },
+  {
+    id: "2",
+    name: "Avocado Chicken Salad",
+    price: 14.99,
+    image: "/images/avocado-chicken.jpg",
+    tags: ["Keto", "Low-Carb"],
+    nutrition: {
+      calories: 380,
+      sugar: 2,
+      protein: 34,
+      carbs: 10,
+      sodium: 320,
+      fiber: 5,
+      healthyTags: ["Low Sugar", "Low Carb", "High Protein"]
+    },
+    description: "A creamy mix of grilled chicken, avocado, and crisp greens."
+  },
+  {
+    id: "3",
+    name: "Chocolate Lava Cake",
+    price: 12.99,
+    image: "/images/lava-cake.jpg",
+    tags: ["Vegetarian"],
+    nutrition: {
+      calories: 620,
+      sugar: 42,
+      protein: 6,
+      carbs: 75,
+      sodium: 210,
+      fiber: 2,
+      healthyTags: []
+    },
+    description: "Warm chocolate cake with a molten center and vanilla ice cream."
+  },
+  {
+    id: "4",
+    name: "Quinoa Power Bowl",
+    price: 15.49,
+    image: "/images/quinoa-bowl.jpg",
+    tags: ["Vegan", "Gluten-Free"],
+    nutrition: {
+      calories: 390,
+      sugar: 5,
+      protein: 22,
+      carbs: 40,
+      sodium: 350,
+      fiber: 8,
+      healthyTags: ["High Fiber", "Low Fat", "Heart Healthy"]
+    },
+    description: "Loaded with quinoa, chickpeas, kale, and a zesty tahini dressing."
+  },
+  {
+    id: "5",
+    name: "Turkey Wrap",
+    price: 12.49,
+    image: "/images/turkey-wrap.jpg",
+    tags: ["Nut-Free"],
+    nutrition: {
+      calories: 410,
+      sugar: 3,
+      protein: 30,
+      carbs: 35,
+      sodium: 420,
+      fiber: 4,
+      healthyTags: ["High Protein", "Low Sugar", "Low Fat"]
+    },
+    description: "Whole-grain wrap filled with roasted turkey and crisp veggies."
+  }
+];
+
+export default menuItems;
+4️⃣ Filter Logic Update
+Make sure the filtering logic checks:
+
+tags for dietary filters
+
+nutrition.healthyTags for health filters
+
+nutrition.calories for the calorie range
+
+5️⃣ Styling
+Use TailwindCSS styling for all new UI elements:
+
+Modern, minimal design
+
+Soft gold accent (#d4af37) for sliders and buttons
+
+Rounded corners (rounded-2xl)
+
+Light background (bg-[#f9f9f9])
+
+Smooth hover transitions
