@@ -73,7 +73,7 @@ export default function MenuCard({ dish, isOwner, onEdit, onDelete }: MenuCardPr
     <>
       <Card 
         onClick={handleCardClick}
-        className="group overflow-hidden cursor-pointer bg-[#fefefe] border border-gray-200 hover:border-[#d4af37] shadow-sm hover:shadow-2xl hover:shadow-[#d4af37]/20 transition-all duration-500 hover:-translate-y-2 rounded-2xl" 
+        className="group overflow-hidden cursor-pointer bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 hover:border-[#d4af37] shadow-lg hover:shadow-2xl hover:shadow-[#d4af37]/30 transition-all duration-500 hover:-translate-y-2 rounded-2xl" 
         data-testid={`card-dish-${dish.id}`}
       >
         {/* Image Container */}
@@ -93,8 +93,8 @@ export default function MenuCard({ dish, isOwner, onEdit, onDelete }: MenuCardPr
           
           {/* Hover hint */}
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-            <div className="bg-white/95 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg">
-              <span className="text-[#333] font-semibold">Click to view details</span>
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg px-8 py-3.5 rounded-full shadow-2xl border border-[#d4af37]/30">
+              <span className="text-[#333] dark:text-white font-semibold tracking-wide">Click to view details</span>
             </div>
           </div>
         </div>
@@ -180,10 +180,10 @@ export default function MenuCard({ dish, isOwner, onEdit, onDelete }: MenuCardPr
             <Button
               onClick={handleAddToCart}
               disabled={!dish.available}
-              className="w-full bg-gradient-to-r from-[#d4af37] to-[#f4d03f] hover:from-[#c19b2f] hover:to-[#d4af37] text-white font-semibold py-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-[#d4af37] via-[#e8c547] to-[#d4af37] hover:from-[#b89b2f] hover:via-[#d4af37] hover:to-[#b89b2f] text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-2xl hover:shadow-[#d4af37]/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
               data-testid={`button-add-to-cart-${dish.id}`}
             >
-              <ShoppingCart className="w-4 h-4 mr-2" />
+              <ShoppingCart className="w-5 h-5 mr-2" />
               {dish.available ? 'Add to Cart' : 'Unavailable'}
             </Button>
           )}

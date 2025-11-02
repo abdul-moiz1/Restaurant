@@ -76,10 +76,19 @@ export default function DishModal({ dish, open, onClose }: DishModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 bg-[#fefefe]">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 bg-gradient-to-br from-white/95 to-gray-50/95 dark:from-gray-900/95 dark:to-gray-800/95 backdrop-blur-xl border-[#d4af37]/20">
         <div className="relative">
-          {/* Image Carousel */}
-          <div className="relative h-80 md:h-96 bg-black/5 overflow-hidden">
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-10 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md hover:bg-white dark:hover:bg-gray-800 p-2 rounded-full shadow-lg transition-all border border-gray-200/50 dark:border-gray-700/50"
+            data-testid="button-close-modal"
+          >
+            <X className="w-5 h-5 text-[#333] dark:text-white" />
+          </button>
+          
+          {/* Main Image */}
+          <div className="relative h-64 md:h-72 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 overflow-hidden">
             <img
               src={allImages[currentImageIndex]}
               alt={dish.name}
@@ -90,45 +99,56 @@ export default function DishModal({ dish, open, onClose }: DishModalProps) {
               }}
             />
             
+            {/* Navigation arrows for main image */}
             {allImages.length > 1 && (
               <>
                 <button
                   onClick={prevImage}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md hover:bg-white dark:hover:bg-gray-800 p-2 rounded-full shadow-lg transition-all border border-[#d4af37]/30"
                   data-testid="button-prev-image"
                 >
-                  <ChevronLeft className="w-5 h-5 text-[#333]" />
+                  <ChevronLeft className="w-5 h-5 text-[#333] dark:text-white" />
                 </button>
                 <button
                   onClick={nextImage}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md hover:bg-white dark:hover:bg-gray-800 p-2 rounded-full shadow-lg transition-all border border-[#d4af37]/30"
                   data-testid="button-next-image"
                 >
-                  <ChevronRight className="w-5 h-5 text-[#333]" />
+                  <ChevronRight className="w-5 h-5 text-[#333] dark:text-white" />
                 </button>
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                  {allImages.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={`w-2 h-2 rounded-full transition-all ${
-                        index === currentImageIndex ? 'bg-[#d4af37] w-6' : 'bg-white/60'
-                      }`}
-                      data-testid={`button-image-dot-${index}`}
-                    />
-                  ))}
-                </div>
               </>
             )}
-
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all"
-              data-testid="button-close-modal"
-            >
-              <X className="w-5 h-5 text-[#333]" />
-            </button>
           </div>
+          
+          {/* Small Image Thumbnails */}
+          {allImages.length > 1 && (
+            <div className="px-6 pt-4">
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {allImages.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all transform hover:scale-105 ${
+                      index === currentImageIndex 
+                        ? 'border-[#d4af37] shadow-lg shadow-[#d4af37]/30 ring-2 ring-[#d4af37]/20' 
+                        : 'border-gray-300 dark:border-gray-600 hover:border-[#d4af37]/50'
+                    }`}
+                    data-testid={`button-thumbnail-${index}`}
+                  >
+                    <img
+                      src={image}
+                      alt={`${dish.name} view ${index + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800';
+                      }}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Content */}
           <div className="p-6 md:p-8">
@@ -224,10 +244,10 @@ export default function DishModal({ dish, open, onClose }: DishModalProps) {
             <Button
               onClick={handleAddToCart}
               disabled={!dish.available}
-              className="w-full bg-gradient-to-r from-[#d4af37] to-[#f4d03f] hover:from-[#c19b2f] hover:to-[#d4af37] text-white font-semibold py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+              className="w-full bg-gradient-to-r from-[#d4af37] via-[#e8c547] to-[#d4af37] hover:from-[#b89b2f] hover:via-[#d4af37] hover:to-[#b89b2f] text-white font-bold py-6 text-lg rounded-xl shadow-2xl hover:shadow-[#d4af37]/50 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="button-add-to-cart-modal"
             >
-              <ShoppingCart className="w-5 h-5 mr-2" />
+              <ShoppingCart className="w-6 h-6 mr-3" />
               {dish.available ? `Add to Cart - $${dish.price.toFixed(2)}` : 'Currently Unavailable'}
             </Button>
           </div>
