@@ -6,7 +6,26 @@ Gourmet Haven is a dual-role restaurant platform built with React and Firebase t
 
 ## Recent Changes (November 2025)
 
-**Latest Update: Authentication & Navigation Refactoring**
+**Latest Update: Guest Checkout & Order History System**
+- Implemented complete guest checkout flow - customers can order without creating an account
+- Cart button now appears for all users (authenticated or guest) when items are added to cart
+- Checkout page accessible without login, collects delivery information from all customers
+- Order schema created in Firestore with comprehensive tracking:
+  - Order items with quantities and prices
+  - Customer delivery information (name, email, phone, address, notes)
+  - User ID linking for authenticated customers (enables order history)
+  - Guest flag for non-authenticated orders
+  - Order status tracking (pending, confirmed, delivered)
+  - Timestamps for order placement
+- Order History page (/orders) for logged-in customers to view past orders
+- Orders link added to navbar for authenticated customers
+- Order confirmation screen displays after successful checkout with order ID
+- Cart automatically clears after successful order placement
+- All orders saved to Firestore "orders" collection for future tracking and analytics
+- Logged-in users can view complete order history with delivery details and order totals
+- Foundation for future order-based recommendations and personalization
+
+**Previous Update: Authentication & Navigation Refactoring**
 - Simplified navbar by removing Home and Menu links - now shows only logo and Login/Sign Up buttons
 - Implemented RoleSelectionModal component that appears when clicking Login or Sign Up buttons
 - Users must select their role (Owner or Customer) before accessing authentication forms
