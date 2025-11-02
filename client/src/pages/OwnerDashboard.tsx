@@ -5,7 +5,6 @@ import MenuCard from "@/components/MenuCard";
 import DishForm from "@/components/DishForm";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import Footer from "@/components/Footer";
 import { Plus, Utensils, CheckCircle, XCircle, Star } from "lucide-react";
 import {
   collection,
@@ -50,11 +49,12 @@ export default function OwnerDashboard() {
     
     setLoading(true);
     try {
-      const q = query(collection(db, "menu"), where("ownerId", "==", userData.uid));
-      const querySnapshot = await getDocs(q);
+      const menuCollection = collection(db, "menu");
+      const querySnapshot = await getDocs(menuCollection);
       const dishesData: Dish[] = [];
       querySnapshot.forEach((doc) => {
-        dishesData.push({ id: doc.id, ...doc.data() } as Dish);
+        const data = doc.data();
+        dishesData.push({ id: doc.id, ...data, ownerId: data.ownerId || userData.uid } as Dish);
       });
       setDishes(dishesData);
     } catch (error) {
@@ -275,7 +275,6 @@ export default function OwnerDashboard() {
           }}
         />
       </div>
-      <Footer />
     </div>
   );
 }
