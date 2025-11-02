@@ -1,16 +1,12 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import MenuCard from "@/components/MenuCard";
 import Footer from "@/components/Footer";
 import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import heroImage from "@assets/generated_images/Luxury_restaurant_dark_ambiance_b9b12075.png";
-import { ChevronDown, UtensilsCrossed, MapPin, Phone, Mail } from "lucide-react";
+import { ChevronDown, UtensilsCrossed, Sparkles, Clock, Award } from "lucide-react";
 
 interface Dish {
   id: string;
@@ -22,23 +18,10 @@ interface Dish {
   available: boolean;
 }
 
-interface Preferences {
-  cuisines: string[];
-  dietary: string[];
-  priceRange: number[];
-}
-
 export default function Home() {
-  const [, setLocation] = useLocation();
   const [menuItems, setMenuItems] = useState<Dish[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [preferences, setPreferences] = useState<Preferences>({
-    cuisines: [],
-    dietary: [],
-    priceRange: [0, 100],
-  });
-
   const [previewItems, setPreviewItems] = useState<Dish[]>([]);
 
   useEffect(() => {
@@ -77,39 +60,8 @@ export default function Home() {
     };
   }, []);
 
-  const scrollToMenu = () => {
-    document.getElementById("menu")?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const scrollToPreferences = () => {
-    document.getElementById("preferences")?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const toggleCuisine = (cuisine: string) => {
-    setPreferences(prev => ({
-      ...prev,
-      cuisines: prev.cuisines.includes(cuisine)
-        ? prev.cuisines.filter(c => c !== cuisine)
-        : [...prev.cuisines, cuisine]
-    }));
-  };
-
-  const toggleDietary = (option: string) => {
-    setPreferences(prev => ({
-      ...prev,
-      dietary: prev.dietary.includes(option)
-        ? prev.dietary.filter(d => d !== option)
-        : [...prev.dietary, option]
-    }));
-  };
-
-  const applyFilters = () => {
-    const params = new URLSearchParams();
-    if (preferences.cuisines.length > 0) params.set('cuisines', preferences.cuisines.join(','));
-    if (preferences.dietary.length > 0) params.set('dietary', preferences.dietary.join(','));
-    params.set('minPrice', preferences.priceRange[0].toString());
-    params.set('maxPrice', preferences.priceRange[1].toString());
-    setLocation(`/menu?${params.toString()}`);
+  const scrollToHighlights = () => {
+    document.getElementById("highlights")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -145,7 +97,7 @@ export default function Home() {
           </div>
         </div>
         <button
-          onClick={scrollToPreferences}
+          onClick={scrollToHighlights}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/80 hover:text-white transition-all animate-bounce"
           data-testid="button-scroll-down"
         >
@@ -153,93 +105,54 @@ export default function Home() {
         </button>
       </section>
 
-      <section id="preferences" className="py-16 px-4 bg-gradient-to-br from-[#FAF7F2] to-white dark:from-background dark:to-background">
+      <section id="highlights" className="py-24 px-4 bg-gradient-to-br from-[#FAF7F2] to-white dark:from-background dark:to-background">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl lg:text-5xl font-serif font-bold mb-4">Customize Your Experience</h2>
-            <p className="text-lg text-muted-foreground">
-              Set your preferences and discover dishes tailored to your taste
-            </p>
-          </div>
-
-          <Card className="max-w-4xl mx-auto shadow-lg border-[#D4AF37]/20">
-            <CardContent className="p-8">
-              <div className="space-y-8">
-                <div>
-                  <h3 className="text-xl font-serif font-semibold mb-4">Cuisine Preferences</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {['Italian', 'Indian', 'Continental', 'Asian', 'Mexican', 'Mediterranean', 'French', 'Japanese'].map((cuisine) => (
-                      <div key={cuisine} className="flex items-center gap-2">
-                        <Checkbox
-                          id={`cuisine-${cuisine}`}
-                          checked={preferences.cuisines.includes(cuisine)}
-                          onCheckedChange={() => toggleCuisine(cuisine)}
-                          data-testid={`checkbox-cuisine-${cuisine.toLowerCase()}`}
-                        />
-                        <Label htmlFor={`cuisine-${cuisine}`} className="cursor-pointer text-sm">
-                          {cuisine}
-                        </Label>
-                      </div>
-                    ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="group text-center p-8 rounded-2xl bg-white/50 dark:bg-card/50 backdrop-blur-sm border border-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all duration-500 hover:shadow-xl hover:-translate-y-2">
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-[#D4AF37]/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                  <div className="relative bg-gradient-to-br from-[#D4AF37]/10 to-[#FFD700]/10 p-6 rounded-full">
+                    <Sparkles className="w-8 h-8 text-[#D4AF37]" />
                   </div>
                 </div>
-
-                <div>
-                  <h3 className="text-xl font-serif font-semibold mb-4">Dietary Filters</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {['Vegan', 'Vegetarian', 'Keto', 'Gluten-Free', 'Dairy-Free', 'Nut-Free', 'Halal', 'Kosher'].map((option) => (
-                      <div key={option} className="flex items-center gap-2">
-                        <Checkbox
-                          id={`dietary-${option}`}
-                          checked={preferences.dietary.includes(option)}
-                          onCheckedChange={() => toggleDietary(option)}
-                          data-testid={`checkbox-dietary-${option.toLowerCase()}`}
-                        />
-                        <Label htmlFor={`dietary-${option}`} className="cursor-pointer text-sm">
-                          {option}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-xl font-serif font-semibold mb-4">Price Range per Dish</h3>
-                  <div className="space-y-4">
-                    <Slider
-                      min={0}
-                      max={100}
-                      step={5}
-                      value={preferences.priceRange}
-                      onValueChange={(value) => setPreferences(prev => ({ ...prev, priceRange: value }))}
-                      className="w-full"
-                      data-testid="slider-price-range"
-                    />
-                    <div className="flex justify-between items-center">
-                      <div className="flex flex-col">
-                        <span className="text-xs text-muted-foreground">Min Price</span>
-                        <span className="text-base font-semibold text-[#D4AF37]">${preferences.priceRange[0]}</span>
-                      </div>
-                      <span className="text-muted-foreground">—</span>
-                      <div className="flex flex-col text-right">
-                        <span className="text-xs text-muted-foreground">Max Price</span>
-                        <span className="text-base font-semibold text-[#D4AF37]">${preferences.priceRange[1]}{preferences.priceRange[1] === 100 ? '+' : ''}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <Button 
-                  onClick={applyFilters}
-                  className="w-full bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white"
-                  size="lg"
-                  data-testid="button-apply-filters"
-                >
-                  Apply Filters & View Menu
-                </Button>
               </div>
-            </CardContent>
-          </Card>
+              <h3 className="text-2xl font-serif font-bold mb-3">Curated Excellence</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Every dish is carefully crafted by expert chefs using premium ingredients
+              </p>
+            </div>
+
+            <div className="group text-center p-8 rounded-2xl bg-white/50 dark:bg-card/50 backdrop-blur-sm border border-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all duration-500 hover:shadow-xl hover:-translate-y-2">
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-[#D4AF37]/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                  <div className="relative bg-gradient-to-br from-[#D4AF37]/10 to-[#FFD700]/10 p-6 rounded-full">
+                    <Clock className="w-8 h-8 text-[#D4AF37]" />
+                  </div>
+                </div>
+              </div>
+              <h3 className="text-2xl font-serif font-bold mb-3">Fresh & Timely</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Prepared fresh daily and delivered at your convenience
+              </p>
+            </div>
+
+            <div className="group text-center p-8 rounded-2xl bg-white/50 dark:bg-card/50 backdrop-blur-sm border border-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all duration-500 hover:shadow-xl hover:-translate-y-2">
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-[#D4AF37]/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                  <div className="relative bg-gradient-to-br from-[#D4AF37]/10 to-[#FFD700]/10 p-6 rounded-full">
+                    <Award className="w-8 h-8 text-[#D4AF37]" />
+                  </div>
+                </div>
+              </div>
+              <h3 className="text-2xl font-serif font-bold mb-3">Award Winning</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Recognized for culinary excellence and exceptional dining experiences
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 

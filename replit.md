@@ -6,7 +6,15 @@ Gourmet Haven is a dual-role restaurant platform built with React and Firebase t
 
 ## Recent Changes (November 2025)
 
-**Latest Update: Theme Toggle - Light & Dark Mode**
+**Latest Update: Cleaner Home Page Design**
+- Removed "Customize Your Experience" preferences section for a more streamlined, elegant look
+- Replaced with minimal 3-card highlights section (Curated Excellence, Fresh & Timely, Award Winning)
+- Premium glass morphism design with animated hover effects
+- Simplified navigation flow from hero → highlights → featured dishes
+- Users can still access all filters on the Menu page
+- Improved premium aesthetic with less visual clutter
+
+**Previous Update: Theme Toggle - Light & Dark Mode**
 - Implemented ThemeProvider context for global theme state management
 - Added theme toggle button in navbar with Moon/Sun icons
 - Theme persists in localStorage across page reloads and sessions
