@@ -6,7 +6,7 @@ import DishForm from "@/components/DishForm";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import Footer from "@/components/Footer";
-import { Plus, Utensils, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Utensils, CheckCircle, XCircle, Star } from "lucide-react";
 import {
   collection,
   query,
@@ -159,10 +159,13 @@ export default function OwnerDashboard() {
     }
   };
 
+  const topRatedCount = dishes.filter((d) => d.available && (d as any).rating >= 4).length;
+  
   const stats = [
-    { label: "Total Dishes", value: dishes.length, icon: Utensils, color: "text-[#D4AF37]" },
-    { label: "Available", value: dishes.filter((d) => d.available).length, icon: CheckCircle, color: "text-green-600" },
-    { label: "Out of Stock", value: dishes.filter((d) => !d.available).length, icon: XCircle, color: "text-red-600" },
+    { label: "Total Dishes", value: dishes.length, icon: Utensils, color: "text-[#D4AF37]", bgColor: "bg-[#D4AF37]/10" },
+    { label: "Available", value: dishes.filter((d) => d.available).length, icon: CheckCircle, color: "text-green-600", bgColor: "bg-green-50 dark:bg-green-900/20" },
+    { label: "Out of Stock", value: dishes.filter((d) => !d.available).length, icon: XCircle, color: "text-red-600", bgColor: "bg-red-50 dark:bg-red-900/20" },
+    { label: "Premium Items", value: dishes.filter((d) => (d as any).tags?.includes("Premium")).length, icon: Star, color: "text-purple-600", bgColor: "bg-purple-50 dark:bg-purple-900/20" },
   ];
 
   if (loading) {
@@ -174,15 +177,19 @@ export default function OwnerDashboard() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4">
+    <div className="min-h-screen py-12 px-4 bg-gradient-to-br from-[#FAF7F2] to-white dark:from-background dark:to-background">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-10 gap-4">
           <div>
-            <h1 className="text-4xl font-serif font-bold mb-2">Owner Dashboard</h1>
-            <p className="text-muted-foreground">Manage your restaurant menu</p>
+            <h1 className="text-4xl lg:text-5xl font-serif font-bold mb-2 text-gray-900 dark:text-white">Owner Dashboard</h1>
+            <p className="text-lg text-muted-foreground font-sans">Manage your restaurant menu with elegance</p>
           </div>
           <div className="flex gap-3">
-            <Button onClick={handleAddDish} data-testid="button-add-dish" className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white">
+            <Button 
+              onClick={handleAddDish} 
+              data-testid="button-add-dish" 
+              className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white font-medium shadow-lg hover:shadow-xl hover:shadow-[#D4AF37]/30 transition-all duration-300"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Dish
             </Button>
@@ -191,29 +198,33 @@ export default function OwnerDashboard() {
               variant="outline"
               data-testid="button-publish-all"
               disabled={dishes.filter(d => !d.available).length === 0}
+              className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 font-medium"
             >
               Publish All
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <Card key={index} className="shadow-md hover:shadow-lg transition-all border-[#D4AF37]/20">
+              <Card 
+                key={index} 
+                className="shadow-md hover:shadow-xl transition-all duration-300 border-gray-200/50 dark:border-gray-700/50 hover:border-[#D4AF37]/30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"
+              >
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-muted-foreground mb-2 font-sans">
                         {stat.label}
                       </p>
-                      <div className={`text-4xl font-bold ${stat.color}`} data-testid={`stat-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}>
+                      <div className={`text-3xl lg:text-4xl font-bold ${stat.color} font-serif`} data-testid={`stat-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}>
                         {stat.value}
                       </div>
                     </div>
-                    <div className={`p-3 rounded-full bg-${stat.color.split('-')[1]}-100 dark:bg-${stat.color.split('-')[1]}-900/20`}>
-                      <Icon className={`w-8 h-8 ${stat.color}`} />
+                    <div className={`p-3 rounded-full ${stat.bgColor} shadow-sm`}>
+                      <Icon className={`w-7 h-7 ${stat.color}`} />
                     </div>
                   </div>
                 </CardContent>
@@ -223,19 +234,24 @@ export default function OwnerDashboard() {
         </div>
 
         <div>
-          <h2 className="text-3xl font-serif font-semibold mb-6">Your Menu</h2>
+          <h2 className="text-3xl lg:text-4xl font-serif font-semibold mb-8 text-gray-900 dark:text-white">Your Menu</h2>
           {dishes.length === 0 ? (
-            <Card className="p-16 text-center shadow-md">
+            <Card className="p-16 text-center shadow-lg bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-gray-200/50 dark:border-gray-700/50">
               <div className="max-w-md mx-auto">
-                <p className="text-muted-foreground text-lg mb-6">No dishes yet. Start by adding your first menu item!</p>
-                <Button onClick={handleAddDish} size="lg" className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white">
+                <Utensils className="w-16 h-16 text-[#D4AF37] mx-auto mb-6" />
+                <p className="text-muted-foreground text-lg mb-6 font-sans">No dishes yet. Start by adding your first menu item!</p>
+                <Button 
+                  onClick={handleAddDish} 
+                  size="lg" 
+                  className="bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-white font-medium shadow-lg hover:shadow-xl hover:shadow-[#D4AF37]/30 transition-all duration-300"
+                >
                   <Plus className="w-5 h-5 mr-2" />
                   Add Your First Dish
                 </Button>
               </div>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {dishes.map((dish) => (
                 <MenuCard
                   key={dish.id}
