@@ -13,7 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function Signup() {
   const [, setLocation] = useLocation();
-  const { signup, loginWithGoogle, logout } = useAuth();
+  const { signup, signupWithGoogle } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -63,15 +63,12 @@ export default function Signup() {
     setLoading(true);
     setError(null);
     try {
-      const resultUserData = await loginWithGoogle(selectedRole);
-      if (resultUserData) {
-        await logout();
-        toast({
-          title: "Account created successfully!",
-          description: "Please log in to continue.",
-        });
-        setLocation("/login");
-      }
+      await signupWithGoogle(selectedRole);
+      toast({
+        title: "Account created successfully!",
+        description: "Please log in to continue.",
+      });
+      setLocation("/login");
     } catch (error: any) {
       const errorMessage = error.message || "An error occurred during signup.";
       setError(errorMessage);

@@ -22,6 +22,7 @@ interface AuthContextType {
   userData: UserData | null;
   loading: boolean;
   signup: (email: string, password: string, displayName: string, role: "owner" | "customer") => Promise<void>;
+  signupWithGoogle: (role: "owner" | "customer") => Promise<void>;
   login: (email: string, password: string, selectedRole: "owner" | "customer") => Promise<void>;
   loginWithGoogle: (role?: "owner" | "customer") => Promise<UserData | null>;
   logout: () => Promise<void>;
@@ -45,6 +46,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSigningUp, setIsSigningUp] = useState(false);
 
   async function getUserData(uid: string): Promise<UserData | null> {
     try {
@@ -74,10 +76,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function signup(email: string, password: string, displayName: string, role: "owner" | "customer") {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    await createUserData(userCredential.user.uid, email, displayName, role);
-    await signOut(auth);
-    setUserData(null);
+    setIsSigningUp(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await createUserData(userCredential.user.uid, email, displayName, role);
+      await signOut(auth);
+      setUserData(null);
+      setCurrentUser(null);
+    } finally {
+      setIsSigningUp(false);
+    }
   }
 
   async function login(email: string, password: string, selectedRole: "owner" | "customer") {
@@ -95,6 +103,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
     
     setUserData(userData);
+  }
+
+  async function signupWithGoogle(role: "owner" | "customer") {
+    setIsSigningUp(true);
+    try {
+      const userCredential = await signInWithPopup(auth, provider);
+      let userData = await getUserData(userCredential.user.uid);
+      
+      if (!userData && role === "customer") {
+        await createUserData(
+          userCredential.user.uid,
+          userCredential.user.email || "",
+          userCredential.user.displayName || "User",
+          role
+        );
+      } else if (userData) {
+        throw new Error("Account already exists. Please log in instead.");
+      }
+      
+      await signOut(auth);
+      setUserData(null);
+      setCurrentUser(null);
+    } finally {
+      setIsSigningUp(false);
+    }
   }
 
   async function loginWithGoogle(role?: "owner" | "customer"): Promise<UserData | null> {
@@ -127,6 +160,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (isSigningUp) {
+        return;
+      }
+      
       setCurrentUser(user);
       if (user) {
         const data = await getUserData(user.uid);
@@ -138,13 +175,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
 
     return unsubscribe;
-  }, []);
+  }, [isSigningUp]);
 
   const value: AuthContextType = {
     currentUser,
     userData,
     loading,
     signup,
+    signupWithGoogle,
     login,
     loginWithGoogle,
     logout,
