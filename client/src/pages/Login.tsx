@@ -33,7 +33,26 @@ export default function Login() {
         variant: "destructive",
       });
     }
-  }, [setLocation, toast, userData, loading]);
+
+    const handleStorageChange = () => {
+      const updatedRole = localStorage.getItem("selectedRole") as "owner" | "customer" | null;
+      setSelectedRole(updatedRole);
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    
+    const interval = setInterval(() => {
+      const updatedRole = localStorage.getItem("selectedRole") as "owner" | "customer" | null;
+      if (updatedRole !== selectedRole) {
+        setSelectedRole(updatedRole);
+      }
+    }, 100);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
+    };
+  }, [setLocation, toast, userData, loading, selectedRole]);
 
   useEffect(() => {
     if (userData && !loading) {
@@ -125,7 +144,22 @@ export default function Login() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toast({
+                      title: "Password Reset",
+                      description: "Please contact support to reset your password.",
+                    });
+                  }}
+                  className="text-xs text-[#D4AF37] hover:underline"
+                  data-testid="button-forgot-password"
+                >
+                  Forgot password?
+                </button>
+              </div>
               <Input
                 id="password"
                 type="password"
@@ -141,6 +175,19 @@ export default function Login() {
               {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
+
+          {selectedRole === "customer" && (
+            <div className="mt-4 text-center text-sm">
+              Don't have an account?{" "}
+              <button
+                onClick={() => setLocation("/signup")}
+                className="text-[#D4AF37] hover:underline font-medium"
+                data-testid="button-goto-signup"
+              >
+                Sign up
+              </button>
+            </div>
+          )}
 
           {selectedRole === "customer" && (
             <>
