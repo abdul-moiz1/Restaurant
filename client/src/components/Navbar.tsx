@@ -31,13 +31,13 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
   };
 
   const handleSignupClick = () => {
-    setAuthMode("signup");
-    setShowRoleModal(true);
+    localStorage.setItem("selectedRole", "customer");
+    setLocation("/signup");
   };
 
   const handleRoleSelect = (role: "owner" | "customer") => {
     setShowRoleModal(false);
-    setLocation(authMode === "login" ? "/login" : "/signup");
+    setLocation("/login");
   };
 
   return (

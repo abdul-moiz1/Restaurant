@@ -6,7 +6,15 @@ Gourmet Haven is a dual-role restaurant platform built with React and Firebase t
 
 ## Recent Changes (November 2025)
 
-**Latest Update: Premium Font System - Elegant & Readable Typography**
+**Latest Update: Simplified Signup Flow - Direct Customer Registration**
+- Removed role selection popup for signup - clicking "Sign Up" now goes directly to signup page
+- Signup is customer-only - owner accounts must be pre-configured in Firebase
+- Customer role is automatically set when navigating to signup page
+- Login still shows role selection modal (Owner or Customer options)
+- Streamlined user experience - no unnecessary steps for customer registration
+- Owner accounts require manual setup in Firebase Console (see OWNER_SETUP_GUIDE.md)
+
+**Previous Update: Premium Font System - Elegant & Readable Typography**
 - Upgraded from Inter/Playfair Display to Plus Jakarta Sans/Lora font pairing
 - Plus Jakarta Sans for body text - modern, clean, highly readable
 - Lora for headings - elegant serif that's more readable than Playfair Display
