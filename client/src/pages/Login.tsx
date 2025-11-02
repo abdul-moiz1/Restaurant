@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SiGoogle } from "react-icons/si";
+import { AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import OwnerPinModal from "@/components/OwnerPinModal";
@@ -17,6 +19,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<"owner" | "customer" | null>(null);
   const [showPinModal, setShowPinModal] = useState(false);
   const [pinVerified, setPinVerified] = useState(false);
@@ -52,6 +55,7 @@ export default function Login() {
     if (!selectedRole) return;
     
     setLoading(true);
+    setError(null);
     try {
       await login(email, password);
       localStorage.removeItem("selectedRole");
@@ -60,11 +64,8 @@ export default function Login() {
         description: "You've successfully logged in.",
       });
     } catch (error: any) {
-      toast({
-        title: "Login failed",
-        description: error.message || "Invalid email or password.",
-        variant: "destructive",
-      });
+      const errorMessage = error.message || "Invalid email or password.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -74,6 +75,7 @@ export default function Login() {
     if (!selectedRole) return;
     
     setLoading(true);
+    setError(null);
     try {
       const resultUserData = await loginWithGoogle(selectedRole);
       if (resultUserData) {
@@ -84,11 +86,8 @@ export default function Login() {
         });
       }
     } catch (error: any) {
-      toast({
-        title: "Login failed",
-        description: error.message || "An error occurred during Google sign-in.",
-        variant: "destructive",
-      });
+      const errorMessage = error.message || "An error occurred during Google sign-in.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -126,6 +125,16 @@ export default function Login() {
           <CardDescription>Sign in to your Gourmet Haven account</CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <Alert className="mb-4 border-[#D4AF37]/50 bg-[#FAF7F2] dark:bg-[#D4AF37]/10 dark:border-[#D4AF37] text-center" data-testid="alert-error">
+              <div className="flex items-center justify-center gap-2">
+                <AlertCircle className="h-5 w-5 text-[#D4AF37]" />
+                <AlertDescription className="text-gray-800 dark:text-gray-200 text-sm font-medium">
+                  {error}
+                </AlertDescription>
+              </div>
+            </Alert>
+          )}
           <form onSubmit={handleEmailLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
