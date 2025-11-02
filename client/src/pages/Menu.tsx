@@ -155,7 +155,7 @@ export default function Menu() {
           <h1 className="text-4xl lg:text-5xl font-serif font-bold text-center mb-4" data-testid="text-menu-title">
             Our Menu
           </h1>
-          <p className="text-lg text-center text-muted-foreground mb-8">
+          <p className="text-lg text-center text-muted-foreground mb-8 font-sans">
             Refined global cuisine, curated for your taste
           </p>
 
@@ -212,7 +212,7 @@ export default function Menu() {
                   </div>
 
                   <div>
-                    <Label className="text-sm font-medium mb-3 block">Dietary Filters</Label>
+                    <Label className="text-sm font-serif font-bold mb-3 block text-[#D4AF37]">Dietary Filters</Label>
                     <div className="space-y-2">
                       {['Vegetarian', 'Vegan', 'Keto', 'Gluten-Free'].map((dietary) => (
                         <div key={dietary} className="flex items-center gap-2">
