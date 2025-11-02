@@ -89,13 +89,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const userCredential = await signInWithPopup(auth, provider);
     let userData = await getUserData(userCredential.user.uid);
     
-    if (!userData && role) {
+    if (!userData && role === "customer") {
       userData = await createUserData(
         userCredential.user.uid,
         userCredential.user.email || "",
         userCredential.user.displayName || "User",
         role
       );
+    } else if (!userData && role === "owner") {
+      await signOut(auth);
+      throw new Error("Unauthorized: Owner account not found. Owner accounts must be pre-configured in Firebase.");
     }
     
     setUserData(userData);

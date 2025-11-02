@@ -51,14 +51,18 @@ If you don't set this, the default PIN will be `1234`.
 1. Go to your Gourmet Haven app
 2. Click **Login**
 3. Select **Owner** role
-4. Enter your owner email and password
+4. Enter your owner email and password (Google login is disabled for owners for security)
 5. Enter the 4-digit PIN when prompted
 6. You'll be redirected to the Owner Dashboard
+
+**Note**: Google Sign-In is NOT available for owner accounts for security reasons. Owner login requires email/password authentication only.
 
 ## Important Notes
 
 - **No Owner Signup**: The signup flow only allows customers to register
+- **Email/Password Only**: Owner login does NOT support Google Sign-In for security reasons
 - **PIN Protection**: All owner logins require PIN verification for security
+- **Pre-configured Only**: Owner accounts must exist in Firebase before login (no auto-creation)
 - **Single Owner**: Only create one owner account
 - **Password Reset**: If you forget your password, use Firebase Console to reset it
 

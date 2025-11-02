@@ -167,22 +167,26 @@ export default function Login() {
             </Button>
           </form>
 
-          <div className="relative my-6">
-            <Separator />
-            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-sm text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
+          {selectedRole === "customer" && (
+            <>
+              <div className="relative my-6">
+                <Separator />
+                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-sm text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
 
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handleGoogleLogin}
-            data-testid="button-google-login"
-          >
-            <SiGoogle className="mr-2 h-4 w-4" />
-            Sign in with Google
-          </Button>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleGoogleLogin}
+                data-testid="button-google-login"
+              >
+                <SiGoogle className="mr-2 h-4 w-4" />
+                Sign in with Google
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
       <OwnerPinModal
