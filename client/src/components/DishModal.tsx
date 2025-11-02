@@ -43,15 +43,6 @@ export default function DishModal({ dish, open, onClose }: DishModalProps) {
   }, [dish.id, open]);
 
   const handleAddToCart = () => {
-    if (!userData) {
-      toast({
-        title: "✨ Premium Access Required",
-        description: "Please sign in to add exquisite dishes to your collection.",
-        className: "border-[#D4AF37] bg-gradient-to-br from-[#FAF7F2] to-white dark:from-card dark:to-card border-2 shadow-2xl shadow-[#D4AF37]/20",
-      });
-      return;
-    }
-    
     if (dish.available) {
       addToCart({
         id: dish.id,
@@ -63,6 +54,7 @@ export default function DishModal({ dish, open, onClose }: DishModalProps) {
         title: "Added to Cart",
         description: `${dish.name} has been added to your cart.`,
       });
+      onClose();
     }
   };
 
