@@ -12,10 +12,10 @@ const healthOptions = [
   "Low Sugar",
   "High Protein",
   "Low Carb",
-  "Low Sodium",
-  "Heart Healthy",
+  "Low Fat",
   "High Fiber",
-  "Diabetic Friendly",
+  "Heart Healthy",
+  "Low Sodium",
 ];
 
 const dietaryOptions = [

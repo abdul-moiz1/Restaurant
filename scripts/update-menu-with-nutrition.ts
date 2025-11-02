@@ -1,7 +1,19 @@
-import { collection, getDocs, setDoc, doc } from "firebase/firestore";
-import { db } from "./firebase";
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs, deleteDoc, doc, setDoc } from "firebase/firestore";
 
-export const sampleDishes = [
+const firebaseConfig = {
+  apiKey: process.env.VITE_FIREBASE_API_KEY || "AIzaSyA2MAEUXX-R9eQKEMLUophsyC-_OniuThc",
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || "newrestaurant-25f8c.firebaseapp.com",
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID || "newrestaurant-25f8c",
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || "newrestaurant-25f8c.firebasestorage.app",
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "869805725923",
+  appId: process.env.VITE_FIREBASE_APP_ID || "1:869805725923:web:a7a7646d5e26ed27e80dd6",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const nutritionRichDishes = [
   {
     id: "sample-1",
     name: "Grilled Salmon Bowl",
@@ -64,26 +76,30 @@ export const sampleDishes = [
   },
 ];
 
-export async function seedSampleDishes() {
+async function updateMenuWithNutrition() {
+  console.log("🔄 Clearing existing menu items...");
+  
   try {
     const menuRef = collection(db, "menu");
     const snapshot = await getDocs(menuRef);
     
-    if (snapshot.empty) {
-      console.log("Seeding sample menu items...");
-      
-      for (const dish of sampleDishes) {
-        await setDoc(doc(db, "menu", dish.id), dish);
-      }
-      
-      console.log("Sample menu items added successfully!");
-      return true;
-    } else {
-      console.log("Menu already has items, skipping seed.");
-      return false;
+    for (const docSnapshot of snapshot.docs) {
+      await deleteDoc(doc(db, "menu", docSnapshot.id));
+      console.log(`✓ Deleted: ${docSnapshot.data().name || docSnapshot.id}`);
     }
+    
+    console.log("\n✨ Adding nutrition-rich menu items...");
+    
+    for (const dish of nutritionRichDishes) {
+      await setDoc(doc(db, "menu", dish.id), dish);
+      console.log(`✓ Added: ${dish.name} (${dish.calories} kcal)`);
+    }
+    
+    console.log("\n🎉 Successfully updated menu with nutrition data!");
+    console.log(`Total dishes: ${nutritionRichDishes.length}`);
   } catch (error) {
-    console.error("Error seeding sample dishes:", error);
-    return false;
+    console.error("❌ Error updating menu:", error);
   }
 }
+
+updateMenuWithNutrition();

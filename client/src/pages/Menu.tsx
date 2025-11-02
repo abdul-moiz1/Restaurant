@@ -95,7 +95,7 @@ export default function Menu() {
 
     if (healthFilters.length > 0) {
       filtered = filtered.filter((dish) => {
-        if (!dish.healthTags || dish.healthTags.length === 0) return true;
+        if (!dish.healthTags || dish.healthTags.length === 0) return false;
         return dish.healthTags.some((h) => healthFilters.includes(h));
       });
     }
@@ -187,7 +187,7 @@ export default function Menu() {
                   <div>
                     <Label className="text-sm font-serif font-bold mb-3 block text-[#D4AF37]">Health & Nutrition Filters</Label>
                     <div className="space-y-2">
-                      {['Low Sugar', 'High Protein', 'Low Carb', 'Low Sodium', 'Heart Healthy', 'High Fiber', 'Diabetic Friendly'].map((health) => (
+                      {['Low Sugar', 'High Protein', 'Low Carb', 'Low Fat', 'High Fiber', 'Heart Healthy', 'Low Sodium'].map((health) => (
                         <div key={health} className="flex items-center gap-2">
                           <Checkbox
                             id={`health-${health}`}
