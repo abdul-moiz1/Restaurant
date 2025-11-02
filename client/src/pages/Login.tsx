@@ -52,7 +52,7 @@ export default function Login() {
     setLoading(true);
     setError(null);
     try {
-      await login(email, password);
+      await login(email, password, selectedRole);
       localStorage.removeItem("selectedRole");
       toast({
         title: "Welcome back!",

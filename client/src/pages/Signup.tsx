@@ -13,7 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function Signup() {
   const [, setLocation] = useLocation();
-  const { signup, loginWithGoogle } = useAuth();
+  const { signup, loginWithGoogle, logout } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,12 +44,11 @@ export default function Signup() {
     setError(null);
     try {
       await signup(email, password, displayName, selectedRole);
-      localStorage.removeItem("selectedRole");
       toast({
-        title: "Account created!",
-        description: "Welcome to Gourmet Haven.",
+        title: "Account created successfully!",
+        description: "Please log in to continue.",
       });
-      setLocation(selectedRole === "owner" ? "/dashboard" : "/menu");
+      setLocation("/login");
     } catch (error: any) {
       const errorMessage = error.message || "An error occurred during signup.";
       setError(errorMessage);
@@ -66,12 +65,12 @@ export default function Signup() {
     try {
       const resultUserData = await loginWithGoogle(selectedRole);
       if (resultUserData) {
-        localStorage.removeItem("selectedRole");
+        await logout();
         toast({
-          title: "Account created!",
-          description: "Welcome to Gourmet Haven.",
+          title: "Account created successfully!",
+          description: "Please log in to continue.",
         });
-        setLocation(resultUserData.role === "owner" ? "/dashboard" : "/menu");
+        setLocation("/login");
       }
     } catch (error: any) {
       const errorMessage = error.message || "An error occurred during signup.";

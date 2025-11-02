@@ -22,7 +22,7 @@ interface AuthContextType {
   userData: UserData | null;
   loading: boolean;
   signup: (email: string, password: string, displayName: string, role: "owner" | "customer") => Promise<void>;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, selectedRole: "owner" | "customer") => Promise<void>;
   loginWithGoogle: (role?: "owner" | "customer") => Promise<UserData | null>;
   logout: () => Promise<void>;
 }
@@ -75,13 +75,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   async function signup(email: string, password: string, displayName: string, role: "owner" | "customer") {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const userData = await createUserData(userCredential.user.uid, email, displayName, role);
-    setUserData(userData);
+    await createUserData(userCredential.user.uid, email, displayName, role);
+    await signOut(auth);
+    setUserData(null);
   }
 
-  async function login(email: string, password: string) {
+  async function login(email: string, password: string, selectedRole: "owner" | "customer") {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const userData = await getUserData(userCredential.user.uid);
+    
+    if (!userData) {
+      await signOut(auth);
+      throw new Error("User data not found in database.");
+    }
+    
+    if (userData.role !== selectedRole) {
+      await signOut(auth);
+      throw new Error("Unauthorized role");
+    }
+    
     setUserData(userData);
   }
 
@@ -99,6 +111,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } else if (!userData && role === "owner") {
       await signOut(auth);
       throw new Error("Unauthorized: Owner account not found. Owner accounts must be pre-configured in Firebase.");
+    } else if (userData && role && userData.role !== role) {
+      await signOut(auth);
+      throw new Error("Unauthorized role");
     }
     
     setUserData(userData);
