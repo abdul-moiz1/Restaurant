@@ -6,7 +6,16 @@ Gourmet Haven is a dual-role restaurant platform built with React and Firebase t
 
 ## Recent Changes (November 2025)
 
-**Latest Update: Cleaner Home Page Design**
+**Latest Update: Premium Font System - Elegant & Readable Typography**
+- Upgraded from Inter/Playfair Display to Plus Jakarta Sans/Lora font pairing
+- Plus Jakarta Sans for body text - modern, clean, highly readable
+- Lora for headings - elegant serif that's more readable than Playfair Display
+- Improved letter spacing (-0.02em for headings, -0.01em for body)
+- Enhanced line heights (1.6 for body, 1.7 for paragraphs, 1.2 for headings)
+- Added font smoothing and kerning for premium appearance
+- All fonts load from Google Fonts with proper weights (300-700)
+
+**Previous Update: Cleaner Home Page Design**
 - Removed "Customize Your Experience" preferences section for a more streamlined, elegant look
 - Replaced with minimal 3-card highlights section (Curated Excellence, Fresh & Timely, Award Winning)
 - Premium glass morphism design with animated hover effects
