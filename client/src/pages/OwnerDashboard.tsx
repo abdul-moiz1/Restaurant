@@ -24,10 +24,18 @@ interface Dish {
   description: string;
   price: number;
   imageUrl: string;
+  images?: string[];
   tags?: string[];
   available: boolean;
   cuisineType?: string;
   dietary?: string[];
+  healthTags?: string[];
+  calories?: number;
+  sugar?: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+  ingredients?: string[];
   ownerId?: string;
 }
 
@@ -54,7 +62,29 @@ export default function OwnerDashboard() {
       const dishesData: Dish[] = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        dishesData.push({ id: doc.id, ...data, ownerId: data.ownerId || userData.uid } as Dish);
+        
+        const normalizedData: Dish = {
+          id: doc.id,
+          name: data.name,
+          description: data.description,
+          price: data.price,
+          imageUrl: data.imageUrl,
+          available: data.available,
+          tags: Array.isArray(data.tags) ? data.tags : (typeof data.tags === 'string' ? data.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : []),
+          images: Array.isArray(data.images) ? data.images : (typeof data.images === 'string' ? data.images.split(',').map((img: string) => img.trim()).filter(Boolean) : undefined),
+          cuisineType: data.cuisineType,
+          dietary: Array.isArray(data.dietary) ? data.dietary : (typeof data.dietary === 'string' ? data.dietary.split(',').map((d: string) => d.trim()).filter(Boolean) : []),
+          healthTags: Array.isArray(data.healthTags) ? data.healthTags : (typeof data.healthTags === 'string' ? data.healthTags.split(',').map((h: string) => h.trim()).filter(Boolean) : []),
+          calories: data.calories,
+          sugar: data.sugar,
+          protein: data.protein,
+          carbs: data.carbs,
+          fat: data.fat,
+          ingredients: Array.isArray(data.ingredients) ? data.ingredients : (typeof data.ingredients === 'string' ? data.ingredients.split(',').map((i: string) => i.trim()).filter(Boolean) : undefined),
+          ownerId: data.ownerId || userData.uid,
+        };
+        
+        dishesData.push(normalizedData);
       });
       setDishes(dishesData);
     } catch (error) {
@@ -165,7 +195,7 @@ export default function OwnerDashboard() {
     { label: "Total Dishes", value: dishes.length, icon: Utensils, color: "text-[#D4AF37]", bgColor: "bg-[#D4AF37]/10" },
     { label: "Available", value: dishes.filter((d) => d.available).length, icon: CheckCircle, color: "text-green-600", bgColor: "bg-green-50 dark:bg-green-900/20" },
     { label: "Out of Stock", value: dishes.filter((d) => !d.available).length, icon: XCircle, color: "text-red-600", bgColor: "bg-red-50 dark:bg-red-900/20" },
-    { label: "Premium Items", value: dishes.filter((d) => (d as any).tags?.includes("Premium")).length, icon: Star, color: "text-purple-600", bgColor: "bg-purple-50 dark:bg-purple-900/20" },
+    { label: "Premium Items", value: dishes.filter((d) => d.tags?.includes("Premium")).length, icon: Star, color: "text-purple-600", bgColor: "bg-purple-50 dark:bg-purple-900/20" },
   ];
 
   if (loading) {

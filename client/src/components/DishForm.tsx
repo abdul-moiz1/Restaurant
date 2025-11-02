@@ -20,10 +20,18 @@ interface DishFormProps {
     description: string;
     price: number;
     imageUrl: string;
+    images?: string[];
     tags?: string[];
     available: boolean;
     cuisineType?: string;
     dietary?: string[];
+    healthTags?: string[];
+    calories?: number;
+    sugar?: number;
+    protein?: number;
+    carbs?: number;
+    fat?: number;
+    ingredients?: string[];
   };
   isOpen: boolean;
   onSubmit: (dish: any) => void;
@@ -37,10 +45,18 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
     description: "",
     price: 0,
     imageUrl: "",
+    images: "",
     tags: "",
     available: true,
     cuisineType: "",
     dietary: [] as string[],
+    healthTags: [] as string[],
+    calories: undefined as number | undefined,
+    sugar: undefined as number | undefined,
+    protein: undefined as number | undefined,
+    carbs: undefined as number | undefined,
+    fat: undefined as number | undefined,
+    ingredients: "",
   });
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -53,10 +69,18 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
         description: dish?.description || "",
         price: dish?.price || 0,
         imageUrl: dish?.imageUrl || "",
+        images: dish?.images?.join(", ") || "",
         tags: dish?.tags?.join(", ") || "",
         available: dish?.available ?? true,
         cuisineType: dish?.cuisineType || "",
         dietary: dish?.dietary || [],
+        healthTags: dish?.healthTags || [],
+        calories: dish?.calories,
+        sugar: dish?.sugar,
+        protein: dish?.protein,
+        carbs: dish?.carbs,
+        fat: dish?.fat,
+        ingredients: dish?.ingredients?.join(", ") || "",
       });
       setSelectedFile(null);
       setUploadProgress(0);
@@ -66,15 +90,23 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
         description: "",
         price: 0,
         imageUrl: "",
+        images: "",
         tags: "",
         available: true,
         cuisineType: "",
         dietary: [],
+        healthTags: [],
+        calories: undefined,
+        sugar: undefined,
+        protein: undefined,
+        carbs: undefined,
+        fat: undefined,
+        ingredients: "",
       });
       setSelectedFile(null);
       setUploadProgress(0);
     }
-  }, [isOpen, dish?.id, dish?.name, dish?.description, dish?.price, dish?.imageUrl, dish?.tags, dish?.available, dish?.cuisineType, dish?.dietary]);
+  }, [isOpen, dish?.id]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -175,10 +207,39 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
         price: Number(formData.price),
         available: formData.available,
         dietary: formData.dietary,
+        healthTags: formData.healthTags,
       };
       
       if (formData.cuisineType) {
         dishData.cuisineType = formData.cuisineType;
+      }
+      
+      if (formData.images) {
+        dishData.images = formData.images.split(",").map((img) => img.trim()).filter(Boolean);
+      }
+      
+      if (formData.ingredients) {
+        dishData.ingredients = formData.ingredients.split(",").map((ing) => ing.trim()).filter(Boolean);
+      }
+      
+      if (formData.calories !== undefined && formData.calories !== null && !isNaN(formData.calories)) {
+        dishData.calories = Number(formData.calories);
+      }
+      
+      if (formData.protein !== undefined && formData.protein !== null && !isNaN(formData.protein)) {
+        dishData.protein = Number(formData.protein);
+      }
+      
+      if (formData.carbs !== undefined && formData.carbs !== null && !isNaN(formData.carbs)) {
+        dishData.carbs = Number(formData.carbs);
+      }
+      
+      if (formData.fat !== undefined && formData.fat !== null && !isNaN(formData.fat)) {
+        dishData.fat = Number(formData.fat);
+      }
+      
+      if (formData.sugar !== undefined && formData.sugar !== null && !isNaN(formData.sugar)) {
+        dishData.sugar = Number(formData.sugar);
       }
       
       onSubmit(dishData);
@@ -188,9 +249,17 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
         description: "",
         price: 0,
         imageUrl: "",
+        images: "",
         tags: "",
         cuisineType: "",
         dietary: [],
+        healthTags: [],
+        calories: undefined,
+        sugar: undefined,
+        protein: undefined,
+        carbs: undefined,
+        fat: undefined,
+        ingredients: "",
         available: true,
       });
       setSelectedFile(null);
@@ -409,13 +478,111 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
           </div>
 
           <div className="space-y-2">
+            <Label>Health Tags</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {['High Protein', 'Heart Healthy', 'Low Carb', 'Low Sugar', 'Low Fat', 'High Fiber'].map((tag) => (
+                <div key={tag} className="flex items-center gap-2">
+                  <Checkbox
+                    id={`health-${tag}`}
+                    checked={formData.healthTags.includes(tag)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setFormData({ ...formData, healthTags: [...formData.healthTags, tag] });
+                      } else {
+                        setFormData({ ...formData, healthTags: formData.healthTags.filter(t => t !== tag) });
+                      }
+                    }}
+                    data-testid={`checkbox-health-${tag.toLowerCase().replace(/\s+/g, '-')}`}
+                  />
+                  <Label htmlFor={`health-${tag}`} className="cursor-pointer text-sm">
+                    {tag}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="ingredients">Ingredients (comma-separated)</Label>
+            <Textarea
+              id="ingredients"
+              data-testid="input-dish-ingredients"
+              value={formData.ingredients}
+              onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
+              placeholder="e.g., Salmon, Miso Paste, Rice, Bok Choy"
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-base font-semibold">Nutrition Information (per serving)</Label>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="calories">Calories</Label>
+                <Input
+                  id="calories"
+                  type="number"
+                  data-testid="input-dish-calories"
+                  value={formData.calories ?? ""}
+                  onChange={(e) => setFormData({ ...formData, calories: e.target.value ? Number(e.target.value) : undefined })}
+                  placeholder="0"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="protein">Protein (g)</Label>
+                <Input
+                  id="protein"
+                  type="number"
+                  data-testid="input-dish-protein"
+                  value={formData.protein ?? ""}
+                  onChange={(e) => setFormData({ ...formData, protein: e.target.value ? Number(e.target.value) : undefined })}
+                  placeholder="0"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="carbs">Carbs (g)</Label>
+                <Input
+                  id="carbs"
+                  type="number"
+                  data-testid="input-dish-carbs"
+                  value={formData.carbs ?? ""}
+                  onChange={(e) => setFormData({ ...formData, carbs: e.target.value ? Number(e.target.value) : undefined })}
+                  placeholder="0"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="fat">Fat (g)</Label>
+                <Input
+                  id="fat"
+                  type="number"
+                  data-testid="input-dish-fat"
+                  value={formData.fat ?? ""}
+                  onChange={(e) => setFormData({ ...formData, fat: e.target.value ? Number(e.target.value) : undefined })}
+                  placeholder="0"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="sugar">Sugar (g)</Label>
+                <Input
+                  id="sugar"
+                  type="number"
+                  data-testid="input-dish-sugar"
+                  value={formData.sugar ?? ""}
+                  onChange={(e) => setFormData({ ...formData, sugar: e.target.value ? Number(e.target.value) : undefined })}
+                  placeholder="0"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="tags">Tags (comma-separated)</Label>
             <Input
               id="tags"
               data-testid="input-dish-tags"
               value={formData.tags}
               onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-              placeholder="e.g., Spicy, Popular, Chef's Special"
+              placeholder="e.g., Spicy, Popular, Chef's Special, Premium"
             />
             {formData.tags && (
               <div className="flex flex-wrap gap-1.5 mt-2">
@@ -432,6 +599,21 @@ export default function DishForm({ dish, isOpen, onSubmit, onCancel }: DishFormP
                 ))}
               </div>
             )}
+            <p className="text-xs text-muted-foreground">
+              Add "Premium" to mark this dish as a premium item
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="images">Additional Images (comma-separated URLs)</Label>
+            <Textarea
+              id="images"
+              data-testid="input-dish-images"
+              value={formData.images}
+              onChange={(e) => setFormData({ ...formData, images: e.target.value })}
+              placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+              rows={2}
+            />
           </div>
 
           <div className="flex gap-3 pt-4">
