@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ShoppingBag, MapPin, Phone, Mail, User, CheckCircle2 } from "lucide-react";
+import { ShoppingBag, MapPin, Phone, Mail, User, CheckCircle2, ArrowLeft, Plus, Minus } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
@@ -28,7 +28,7 @@ type CheckoutForm = z.infer<typeof checkoutSchema>;
 
 export default function Checkout() {
   const { userData } = useAuth();
-  const { cart, total, clearCart } = useCart();
+  const { cart, total, clearCart, updateQuantity, removeFromCart } = useCart();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -175,10 +175,18 @@ export default function Checkout() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FAF7F2] to-white py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#FAF7F2] to-white dark:from-background dark:to-background py-12 px-4">
       <div className="max-w-6xl mx-auto">
+        <div className="flex items-center gap-4 mb-6">
+          <Link href="/menu">
+            <Button variant="outline" size="sm" className="gap-2" data-testid="button-back-to-menu">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Menu
+            </Button>
+          </Link>
+        </div>
         <h1 className="text-4xl font-serif font-bold mb-2">Checkout</h1>
-        <p className="text-muted-foreground mb-8">Complete your order details</p>
+        <p className="text-muted-foreground mb-8">Complete your delivery details to place your order</p>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Checkout Form */}
@@ -314,16 +322,43 @@ export default function Checkout() {
               <CardContent>
                 <div className="space-y-4 mb-6">
                   {cart.map((item) => (
-                    <div key={item.id} className="flex gap-3">
+                    <div key={item.id} className="flex gap-3 pb-3 border-b last:border-b-0">
                       <img
                         src={item.imageUrl}
                         alt={item.name}
-                        className="w-16 h-16 object-cover rounded"
+                        className="w-16 h-16 object-contain rounded bg-gray-50 dark:bg-gray-800"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400';
+                        }}
                       />
-                      <div className="flex-1">
-                        <h4 className="font-serif font-semibold text-sm">{item.name}</h4>
-                        <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
-                        <p className="text-sm font-semibold text-[#D4AF37]">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-serif font-semibold text-sm mb-1 truncate" data-testid={`text-checkout-item-${item.id}`}>{item.name}</h4>
+                        <div className="flex items-center gap-2 mb-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            disabled={item.quantity <= 1}
+                            className="h-6 w-6 p-0"
+                            data-testid={`button-decrease-checkout-${item.id}`}
+                          >
+                            <Minus className="w-3 h-3" />
+                          </Button>
+                          <span className="text-xs font-medium min-w-[1.5rem] text-center" data-testid={`text-quantity-checkout-${item.id}`}>
+                            {item.quantity}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            className="h-6 w-6 p-0"
+                            data-testid={`button-increase-checkout-${item.id}`}
+                          >
+                            <Plus className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        <p className="text-sm font-semibold text-[#D4AF37]" data-testid={`text-item-total-checkout-${item.id}`}>
                           ${(item.price * item.quantity).toFixed(2)}
                         </p>
                       </div>
