@@ -13,6 +13,12 @@ Preferred communication style: Simple, everyday language.
   - Fixed role switching: Login page now updates dynamically when user changes role from navbar via localStorage listener
   - Added "Forgot password?" link that displays a toast notification
   - Added "Sign up" button for customers that redirects to signup page
+- **Order History Page Fixes**:
+  - Fixed Firestore query issue that prevented orders from displaying (removed composite index requirement)
+  - Added JavaScript-based sorting by creation date as fallback
+  - Implemented date-based tabs (All, Today, Yesterday, This Week, Earlier) for better organization
+  - Added improved error logging for debugging order fetch issues
+  - Enhanced UI with empty states for each tab
 
 ## System Architecture
 
