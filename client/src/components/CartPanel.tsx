@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/CartContext";
-import { useAuth } from "@/contexts/AuthContext";
-import { Trash2, Plus, Minus, ShoppingCart, X } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingCart } from "lucide-react";
 import { useLocation } from "wouter";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -13,33 +12,18 @@ interface CartPanelProps {
 
 export default function CartPanel({ isOpen, onClose }: CartPanelProps) {
   const { cart, removeFromCart, updateQuantity, clearCart, total, itemCount } = useCart();
-  const { userData } = useAuth();
   const [, setLocation] = useLocation();
 
   const handleCheckout = () => {
     onClose();
-    if (!userData) {
-      setLocation("/login");
-    } else {
-      setLocation("/checkout");
-    }
+    setLocation("/checkout");
   };
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent side="left" className="w-full sm:w-[500px] flex flex-col p-0">
         <SheetHeader className="px-6 py-4 border-b">
-          <div className="flex items-center justify-between">
-            <SheetTitle className="text-2xl font-serif">Your Cart</SheetTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              data-testid="button-close-cart"
-            >
-              <X className="w-5 h-5" />
-            </Button>
-          </div>
+          <SheetTitle className="text-2xl font-serif">Your Cart</SheetTitle>
           <p className="text-sm text-muted-foreground text-left">
             {itemCount} {itemCount === 1 ? 'item' : 'items'} in your cart
           </p>
@@ -171,7 +155,7 @@ export default function CartPanel({ isOpen, onClose }: CartPanelProps) {
                 size="lg"
                 data-testid="button-checkout"
               >
-                {userData ? "Proceed to Checkout" : "Login to Checkout"}
+                Proceed to Checkout
               </Button>
             </div>
           </>
