@@ -19,11 +19,17 @@ export const dishSchema = z.object({
   price: z.number(),
   tags: z.array(z.string()).optional(),
   imageUrl: z.string(),
+  images: z.array(z.string()).optional(),
   available: z.boolean(),
   cuisineType: z.string().optional(),
   dietary: z.array(z.string()).optional(),
   healthTags: z.array(z.string()).optional(),
   calories: z.number().optional(),
+  sugar: z.number().optional(),
+  protein: z.number().optional(),
+  carbs: z.number().optional(),
+  fat: z.number().optional(),
+  ingredients: z.array(z.string()).optional(),
   ownerId: z.string().optional(),
 });
 

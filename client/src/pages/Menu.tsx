@@ -19,12 +19,18 @@ interface Dish {
   description: string;
   price: number;
   imageUrl: string;
+  images?: string[];
   tags?: string[];
   available: boolean;
   cuisineType?: string;
   dietary?: string[];
   healthTags?: string[];
   calories?: number;
+  sugar?: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+  ingredients?: string[];
   ownerId?: string;
 }
 
@@ -295,7 +301,7 @@ export default function Menu() {
                 Showing {filteredDishes.length} {filteredDishes.length === 1 ? 'dish' : 'dishes'}
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
               {filteredDishes.map((dish) => (
                 <MenuCard 
                   key={dish.id} 
