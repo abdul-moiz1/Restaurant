@@ -3,11 +3,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useLocation } from "wouter";
-import { ShoppingBag, Clock, CheckCircle, Package } from "lucide-react";
+import { ShoppingBag, Clock, CheckCircle, Package, Calendar } from "lucide-react";
 import { db } from "@/lib/firebase";
-import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
-import { format } from "date-fns";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { format, isToday, isYesterday, isThisWeek, startOfWeek } from "date-fns";
 
 interface OrderItem {
   id: string;
@@ -60,8 +61,7 @@ export default function OrderHistory() {
       const ordersRef = collection(db, "orders");
       const q = query(
         ordersRef,
-        where("userId", "==", userData.uid),
-        orderBy("createdAt", "desc")
+        where("userId", "==", userData.uid)
       );
 
       const querySnapshot = await getDocs(q);
@@ -74,9 +74,17 @@ export default function OrderHistory() {
         } as Order);
       });
 
+      fetchedOrders.sort((a, b) => {
+        const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+        const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+        return bTime - aTime;
+      });
+
+      console.log("Fetched orders:", fetchedOrders.length);
       setOrders(fetchedOrders);
     } catch (error) {
       console.error("Error fetching orders:", error);
+      console.error("Error details:", JSON.stringify(error, null, 2));
     } finally {
       setIsLoading(false);
     }
@@ -122,6 +130,104 @@ export default function OrderHistory() {
     }
   };
 
+  const groupOrdersByDate = () => {
+    const today: Order[] = [];
+    const yesterday: Order[] = [];
+    const thisWeek: Order[] = [];
+    const earlier: Order[] = [];
+
+    orders.forEach((order) => {
+      if (!order.createdAt?.toDate) {
+        earlier.push(order);
+        return;
+      }
+
+      const orderDate = order.createdAt.toDate();
+      
+      if (isToday(orderDate)) {
+        today.push(order);
+      } else if (isYesterday(orderDate)) {
+        yesterday.push(order);
+      } else if (isThisWeek(orderDate, { weekStartsOn: 0 })) {
+        thisWeek.push(order);
+      } else {
+        earlier.push(order);
+      }
+    });
+
+    return { today, yesterday, thisWeek, earlier };
+  };
+
+  const { today, yesterday, thisWeek, earlier } = groupOrdersByDate();
+
+  const renderOrderCard = (order: Order) => (
+    <Card key={order.id} className="border-[#D4AF37]/20" data-testid={`order-${order.id}`}>
+      <CardHeader>
+        <div className="flex items-start justify-between">
+          <div>
+            <CardTitle className="font-serif flex items-center gap-2 mb-2">
+              Order #{order.id.slice(0, 8).toUpperCase()}
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              {order.createdAt?.toDate ? format(order.createdAt.toDate(), "PPP 'at' p") : "Recently placed"}
+            </p>
+          </div>
+          <Badge className={`${getStatusColor(order.status)} flex items-center gap-1`}>
+            {getStatusIcon(order.status)}
+            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {/* Order Items */}
+          <div className="space-y-3">
+            {order.items.map((item, index) => (
+              <div key={index} className="flex gap-3">
+                <img
+                  src={item.imageUrl}
+                  alt={item.name}
+                  className="w-16 h-16 object-cover rounded"
+                />
+                <div className="flex-1">
+                  <h4 className="font-serif font-semibold">{item.name}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Quantity: {item.quantity}
+                  </p>
+                  <p className="text-sm font-semibold text-[#D4AF37]">
+                    ${(item.price * item.quantity).toFixed(2)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Delivery Info */}
+          <div className="border-t pt-4">
+            <h4 className="font-semibold mb-2">Delivery Information</h4>
+            <p className="text-sm text-muted-foreground">
+              <strong>Name:</strong> {order.customerInfo.fullName}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              <strong>Address:</strong> {order.customerInfo.address}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              <strong>Phone:</strong> {order.customerInfo.phone}
+            </p>
+          </div>
+
+          {/* Order Total */}
+          <div className="border-t pt-4 flex justify-between items-center">
+            <span className="font-semibold">Order Total</span>
+            <span className="text-xl font-bold text-[#D4AF37]" data-testid={`total-${order.id}`}>
+              ${order.total.toFixed(2)}
+            </span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FAF7F2] to-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -152,75 +258,81 @@ export default function OrderHistory() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-6">
-            {orders.map((order) => (
-              <Card key={order.id} className="border-[#D4AF37]/20" data-testid={`order-${order.id}`}>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="font-serif flex items-center gap-2 mb-2">
-                        Order #{order.id.slice(0, 8).toUpperCase()}
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        {order.createdAt?.toDate ? format(order.createdAt.toDate(), "PPP 'at' p") : "Recently placed"}
-                      </p>
-                    </div>
-                    <Badge className={`${getStatusColor(order.status)} flex items-center gap-1`}>
-                      {getStatusIcon(order.status)}
-                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Order Items */}
-                    <div className="space-y-3">
-                      {order.items.map((item, index) => (
-                        <div key={index} className="flex gap-3">
-                          <img
-                            src={item.imageUrl}
-                            alt={item.name}
-                            className="w-16 h-16 object-cover rounded"
-                          />
-                          <div className="flex-1">
-                            <h4 className="font-serif font-semibold">{item.name}</h4>
-                            <p className="text-sm text-muted-foreground">
-                              Quantity: {item.quantity}
-                            </p>
-                            <p className="text-sm font-semibold text-[#D4AF37]">
-                              ${(item.price * item.quantity).toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="grid w-full grid-cols-5 mb-6" data-testid="tabs-order-filter">
+              <TabsTrigger value="all" data-testid="tab-all">
+                All ({orders.length})
+              </TabsTrigger>
+              <TabsTrigger value="today" data-testid="tab-today">
+                Today ({today.length})
+              </TabsTrigger>
+              <TabsTrigger value="yesterday" data-testid="tab-yesterday">
+                Yesterday ({yesterday.length})
+              </TabsTrigger>
+              <TabsTrigger value="thisWeek" data-testid="tab-week">
+                This Week ({thisWeek.length})
+              </TabsTrigger>
+              <TabsTrigger value="earlier" data-testid="tab-earlier">
+                Earlier ({earlier.length})
+              </TabsTrigger>
+            </TabsList>
 
-                    {/* Delivery Info */}
-                    <div className="border-t pt-4">
-                      <h4 className="font-semibold mb-2">Delivery Information</h4>
-                      <p className="text-sm text-muted-foreground">
-                        <strong>Name:</strong> {order.customerInfo.fullName}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        <strong>Address:</strong> {order.customerInfo.address}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        <strong>Phone:</strong> {order.customerInfo.phone}
-                      </p>
-                    </div>
+            <TabsContent value="all" className="space-y-6">
+              {orders.map((order) => renderOrderCard(order))}
+            </TabsContent>
 
-                    {/* Order Total */}
-                    <div className="border-t pt-4 flex justify-between items-center">
-                      <span className="font-semibold">Order Total</span>
-                      <span className="text-xl font-bold text-[#D4AF37]" data-testid={`total-${order.id}`}>
-                        ${order.total.toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+            <TabsContent value="today" className="space-y-6">
+              {today.length === 0 ? (
+                <Card className="border-[#D4AF37]/20">
+                  <CardContent className="py-12 text-center">
+                    <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No orders placed today</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                today.map((order) => renderOrderCard(order))
+              )}
+            </TabsContent>
+
+            <TabsContent value="yesterday" className="space-y-6">
+              {yesterday.length === 0 ? (
+                <Card className="border-[#D4AF37]/20">
+                  <CardContent className="py-12 text-center">
+                    <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No orders placed yesterday</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                yesterday.map((order) => renderOrderCard(order))
+              )}
+            </TabsContent>
+
+            <TabsContent value="thisWeek" className="space-y-6">
+              {thisWeek.length === 0 ? (
+                <Card className="border-[#D4AF37]/20">
+                  <CardContent className="py-12 text-center">
+                    <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No orders placed this week</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                thisWeek.map((order) => renderOrderCard(order))
+              )}
+            </TabsContent>
+
+            <TabsContent value="earlier" className="space-y-6">
+              {earlier.length === 0 ? (
+                <Card className="border-[#D4AF37]/20">
+                  <CardContent className="py-12 text-center">
+                    <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No earlier orders</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                earlier.map((order) => renderOrderCard(order))
+              )}
+            </TabsContent>
+          </Tabs>
         )}
       </div>
     </div>
