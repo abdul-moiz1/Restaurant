@@ -11,11 +11,7 @@ export default function Cart() {
   const [, setLocation] = useLocation();
 
   const handleCheckout = () => {
-    if (!userData) {
-      setLocation("/login");
-    } else {
-      setLocation("/checkout");
-    }
+    setLocation("/checkout");
   };
 
   if (cart.length === 0) {
@@ -152,7 +148,7 @@ export default function Cart() {
                   size="lg"
                   data-testid="button-checkout"
                 >
-                  {userData ? "Proceed to Checkout" : "Login to Checkout"}
+                  Proceed to Checkout
                 </Button>
                 <Link href="/menu">
                   <Button

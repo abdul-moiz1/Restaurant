@@ -16,6 +16,7 @@ import Menu from "@/pages/Menu";
 import Preferences from "@/pages/Preferences";
 import Checkout from "@/pages/Checkout";
 import Cart from "@/pages/Cart";
+import OrderHistory from "@/pages/OrderHistory";
 import OwnerDashboard from "@/pages/OwnerDashboard";
 import NotFound from "@/pages/not-found";
 
@@ -65,8 +66,9 @@ function Router() {
         <Route path="/menu" component={Menu} />
         <Route path="/preferences" component={Preferences} />
         <Route path="/cart" component={Cart} />
-        <Route path="/checkout">
-          {() => <ProtectedRoute component={Checkout} requiredRole="customer" />}
+        <Route path="/checkout" component={Checkout} />
+        <Route path="/orders">
+          {() => <ProtectedRoute component={OrderHistory} requiredRole="customer" />}
         </Route>
         <Route path="/dashboard">
           {() => <ProtectedRoute component={OwnerDashboard} requiredRole="owner" />}

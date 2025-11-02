@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LogOut, ShoppingCart, UtensilsCrossed } from "lucide-react";
+import { LogOut, ShoppingCart, UtensilsCrossed, History } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useState } from "react";
 import RoleSelectionModal from "./RoleSelectionModal";
@@ -54,27 +54,44 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
           </Link>
 
           <div className="flex items-center gap-6">
+            {/* Show cart button for all users when cart has items OR for logged-in customers */}
+            {(itemCount > 0 || (user && user.role === "customer")) && (!user || user.role !== "owner") && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowCartPanel(true)}
+                data-testid="button-nav-cart"
+                className="flex items-center gap-2 relative"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                Cart
+                {itemCount > 0 && (
+                  <Badge className="ml-1 bg-[#D4AF37] text-white px-2 py-0.5 text-xs" data-testid="badge-cart-count">
+                    {itemCount}
+                  </Badge>
+                )}
+              </Button>
+            )}
+            
             {user ? (
               <>
                 <span className="text-sm text-muted-foreground" data-testid="text-welcome-user">
                   Welcome, <span className="text-[#D4AF37] font-medium">{user.displayName || user.email.split('@')[0]}</span>
                 </span>
                 {user.role === "customer" && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowCartPanel(true)}
-                    data-testid="button-nav-cart"
-                    className="flex items-center gap-2 relative"
+                  <Link 
+                    href="/orders"
+                    data-testid="link-nav-orders"
                   >
-                    <ShoppingCart className="w-4 h-4" />
-                    Cart
-                    {itemCount > 0 && (
-                      <Badge className="ml-1 bg-[#D4AF37] text-white px-2 py-0.5 text-xs" data-testid="badge-cart-count">
-                        {itemCount}
-                      </Badge>
-                    )}
-                  </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={`flex items-center gap-2 ${location === "/orders" ? "text-[#D4AF37]" : ""}`}
+                    >
+                      <History className="w-4 h-4" />
+                      Orders
+                    </Button>
+                  </Link>
                 )}
                 {user.role === "owner" && (
                   <Link 
