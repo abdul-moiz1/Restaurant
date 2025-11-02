@@ -83,9 +83,21 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        serif: ['Playfair Display', 'serif'],
-        mono: ["var(--font-mono)"],
+        sans: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        serif: ['Lora', 'ui-serif', 'Georgia', 'serif'],
+        mono: ["ui-monospace", "Menlo", "monospace"],
+      },
+      letterSpacing: {
+        tighter: '-0.02em',
+        tight: '-0.01em',
+        normal: '0',
+        wide: '0.01em',
+        wider: '0.02em',
+        widest: '0.03em',
+      },
+      lineHeight: {
+        'extra-relaxed': '1.75',
+        'super-relaxed': '1.85',
       },
       keyframes: {
         "accordion-down": {
