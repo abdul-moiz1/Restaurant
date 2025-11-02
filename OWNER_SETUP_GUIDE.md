@@ -33,27 +33,13 @@ After creating the Firebase Auth user, you need to add the owner role in Firesto
    ```
 5. Save the document
 
-### 3. Set Owner PIN (Optional but Recommended)
-
-The owner PIN adds an extra layer of security when logging in as owner.
-
-**In Replit:**
-1. Go to the **Secrets** tab (lock icon in left sidebar)
-2. Add a new secret:
-   - **Key**: `VITE_OWNER_PIN`
-   - **Value**: Your 4-digit PIN (e.g., `1234`)
-3. Click **Add Secret**
-
-If you don't set this, the default PIN will be `1234`.
-
-### 4. Login as Owner
+### 3. Login as Owner
 
 1. Go to your Gourmet Haven app
 2. Click **Login**
 3. Select **Owner** role
 4. Enter your owner email and password (Google login is disabled for owners for security)
-5. Enter the 4-digit PIN when prompted
-6. You'll be redirected to the Owner Dashboard
+5. You'll be redirected to the Owner Dashboard automatically!
 
 **Note**: Google Sign-In is NOT available for owner accounts for security reasons. Owner login requires email/password authentication only.
 
@@ -61,7 +47,7 @@ If you don't set this, the default PIN will be `1234`.
 
 - **No Owner Signup**: The signup flow only allows customers to register
 - **Email/Password Only**: Owner login does NOT support Google Sign-In for security reasons
-- **PIN Protection**: All owner logins require PIN verification for security
+- **Role-Based Access**: Security is based on the `role` field in Firestore (no PIN needed)
 - **Pre-configured Only**: Owner accounts must exist in Firebase before login (no auto-creation)
 - **Single Owner**: Only create one owner account
 - **Password Reset**: If you forget your password, use Firebase Console to reset it
@@ -70,10 +56,6 @@ If you don't set this, the default PIN will be `1234`.
 
 **Can't see owner role in signup:**
 - This is correct! Owner option only appears on the login page, not signup.
-
-**PIN not working:**
-- Check that `VITE_OWNER_PIN` is set correctly in Replit Secrets
-- Default PIN is `1234` if not set
 
 **Login fails:**
 - Verify the email/password in Firebase Console

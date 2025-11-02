@@ -10,19 +10,16 @@ import { SiGoogle } from "react-icons/si";
 import { AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import OwnerPinModal from "@/components/OwnerPinModal";
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  const { login, loginWithGoogle, userData, logout } = useAuth();
+  const { login, loginWithGoogle, userData } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<"owner" | "customer" | null>(null);
-  const [showPinModal, setShowPinModal] = useState(false);
-  const [pinVerified, setPinVerified] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem("selectedRole") as "owner" | "customer" | null;
@@ -40,15 +37,13 @@ export default function Login() {
 
   useEffect(() => {
     if (userData && !loading) {
-      if (userData.role === "owner" && !pinVerified) {
-        setShowPinModal(true);
+      if (userData.role === "owner") {
+        setLocation("/dashboard");
       } else if (userData.role === "customer") {
         setLocation("/menu");
-      } else if (userData.role === "owner" && pinVerified) {
-        setLocation("/dashboard");
       }
     }
-  }, [userData, pinVerified, setLocation, loading]);
+  }, [userData, setLocation, loading]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,26 +86,6 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handlePinSuccess = () => {
-    setPinVerified(true);
-    setShowPinModal(false);
-    toast({
-      title: "Access granted",
-      description: "Welcome to the Owner Dashboard.",
-    });
-  };
-
-  const handlePinCancel = async () => {
-    setShowPinModal(false);
-    await logout();
-    setLocation("/");
-    toast({
-      title: "Login cancelled",
-      description: "PIN verification was cancelled.",
-      variant: "destructive",
-    });
   };
 
   if (!selectedRole) {
@@ -189,11 +164,6 @@ export default function Login() {
           )}
         </CardContent>
       </Card>
-      <OwnerPinModal
-        isOpen={showPinModal}
-        onSuccess={handlePinSuccess}
-        onCancel={handlePinCancel}
-      />
     </div>
   );
 }

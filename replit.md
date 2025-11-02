@@ -6,7 +6,14 @@ Gourmet Haven is a dual-role restaurant platform built with React and Firebase t
 
 ## Recent Changes (November 2025)
 
-**Latest Update: Enhanced Owner Login Security**
+**Latest Update: Removed PIN Verification - Role-Based Access Only**
+- Removed owner PIN verification system (no longer needed)
+- Security now based purely on Firebase role assignment
+- Owner login redirects directly to dashboard (no PIN prompt)
+- Simplified authentication flow - just email/password for owners
+- Role is assigned in Firebase Firestore (see FIREBASE_ROLE_SETUP.md)
+
+**Previous Update: Enhanced Owner Login Security**
 - Removed Google Sign-In button for owner logins (only available for customer logins)
 - Owner accounts can ONLY login with email/password (no auto-creation via Google)
 - Attempting Google login as owner without pre-existing account shows error message
